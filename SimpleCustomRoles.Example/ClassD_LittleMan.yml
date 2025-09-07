@@ -1,0 +1,28 @@
+rolename: ClassD_LittleMan
+display:
+  rARoleName: Little Man
+  areaRoleName: Little Man
+  colorHex: 'orange'
+spawn:
+  spawnChance: 600 #400
+  spawnAmount: 1
+roleToSpawn: ClassD
+replaceRole: ClassD
+hint:
+  hint: You're small and spawn with candy!
+  hintDuration: 15
+fpc:
+  scale:
+    x: 0.75
+    y: 0.75
+    z: 0.75
+candy:
+  candies:
+  - Blue
+  - Yellow
+  - Rainbow
+  - Yellow
+  - Green
+  - Purple
+  - Red
+  - Blue

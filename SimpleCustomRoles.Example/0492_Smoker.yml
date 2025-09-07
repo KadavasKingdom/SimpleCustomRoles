@@ -1,0 +1,22 @@
+rolename: 0492_Smoker
+display:
+  rARoleName: 049-2 Smoker
+  areaRoleName: 049-2 Smoker
+  colorHex: '#ff0000'
+spawn:
+  spawnChance: 10000
+  spawnAmount: 2
+roleType: ScpSpecific
+roleToSpawn: Scp0492
+replaceRole: Scp0492
+inventory:
+  items:
+  - SCP244b
+  - SCP244a
+hint:
+  hint: You create a smoke cloud on death.
+  hintDuration: 15
+scp:
+  scp0492:
+    canSpawnIfNoCustom094: true
+    chanceForSpawn: 1200

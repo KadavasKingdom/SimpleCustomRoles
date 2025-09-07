@@ -1,0 +1,22 @@
+rolename: 049_ScpRevive
+roleToSpawn: Scp049
+replaceRole: Scp049
+display:
+  rARoleName: ScpRevive
+  areaRoleName: ScpRevive
+  spectatorRoleName: ScpRevive
+  colorHex: '#ff0000'
+spawn:
+  spawnChance: 0
+  spawnAmount: 1
+stats:
+  health:
+    value: 1000
+    math: Add
+scp:
+  scp049:
+    random:
+    - 173_BigNut
+    - 939_Chihuahua
+    - 096_ThinGuy
+    - 0492_LootGoblin

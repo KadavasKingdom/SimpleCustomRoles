@@ -1,0 +1,51 @@
+rolename: ClassD_Electrified
+display:
+  rARoleName: Electrified
+  areaRoleName: Electrified
+  colorHex: 'orange'
+spawn:
+  spawnChance: 401 #800
+  spawnAmount: 1
+roleToSpawn: ClassD
+replaceRole: ClassD
+hint:
+  hint: You're completely immune to electrical damage effects including from\n Teslas, Micro and the Particle Disruptor.
+  hintDuration: 15
+damage:
+  damageReceived:
+    ?
+      damageType: Universal
+      damageSubType: UniversalSubType
+      subType: Tesla
+    : value: 0
+      math: Set
+    ?
+      damageType: Disruptor
+      damageSubType: Disruptor_FiringState
+      subType: FiringRapid
+    : value: 0
+      math: Set
+    ?
+      damageType: Disruptor
+      damageSubType: Disruptor_FiringState
+      subType: FiringSingle
+    : value: 0
+      math: Set
+    ?
+      damageType: MicroHid
+      damageSubType: MicroHidFiringMode
+      subType: PrimaryFire
+    : value: 0
+      math: Set
+    ?
+      damageType: MicroHid
+      damageSubType: MicroHidFiringMode
+      subType: ChargeFire
+    : value: 0
+      math: Set
+    ?
+      damageType: MicroHid
+      damageSubType: MicroHidFiringMode
+      subType: BrokenFire
+    : value: 0
+      math: Set

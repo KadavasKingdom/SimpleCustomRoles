@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);ENABLEEFFECTHUD</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="EffectOnHUD" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="../SimpleCustomRoles/**/*.cs" />
+		<Compile Remove="../SimpleCustomRoles/obj/**" />
+		<Compile Remove="../SimpleCustomRoles/bin/**" />
+	</ItemGroup>
+</Project>
