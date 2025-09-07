@@ -1,7 +1,5 @@
-﻿using LabApi.Events.Arguments.ServerEvents;
-using LabApi.Events.CustomHandlers;
+﻿using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
-using LabApiExtensions.Extensions;
 using MEC;
 using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleInfo;
@@ -12,11 +10,6 @@ namespace SimpleCustomRoles.Handler;
 
 internal class ServerHandler : CustomEventsHandler
 {
-    public override void OnServerRoundEnded(RoundEndedEventArgs ev)
-    {
-        //AppearanceSyncExtension.Stop();
-    }
-
     public static void ReloadRoles()
     {
         Main.Instance.InWaveRoles = [];
@@ -49,7 +42,6 @@ internal class ServerHandler : CustomEventsHandler
 
     public override void OnServerRoundStarted()
     {
-        //AppearanceSyncExtension.Start();
         if (Main.Instance.Config.IsPaused)
             return;
 
@@ -127,7 +119,8 @@ internal class ServerHandler : CustomEventsHandler
                 if (player == null)
                     continue;
 
-                CL.Info($"Player Selected to spawn: {player.UserId} as {item.Rolename}");
+                if (Main.Instance.Config.ShowSpawnMessage)
+                    CL.Info($"Player Selected to spawn: {player.UserId} as {item.Rolename}");
                 NotRoll.Add(player);
                 CustomRoleHelpers.SetCustomInfoToPlayer(player, item);
             }

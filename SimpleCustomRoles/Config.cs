@@ -17,6 +17,9 @@ public class Config
     public string CustomItemCommand { get; set; } = "/lci give {0} {1}";
     public bool CustomItemUseName { get; set; } = true;
 
+    [Description("Showing spawn message in console")]
+    public bool ShowSpawnMessage { get; set; }
+
     public Dictionary<EscapeConfig, RoleTypeId> EscapeConfigs { get; set; } = new()
     {
         {
