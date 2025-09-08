@@ -41,7 +41,7 @@ jobs:
       - name : Upload
         uses: actions/upload-artifact@v4.3.5
         with:
-          name: ${{ env.ProjName }}
+          name: SimpleCustomRoles
           path: Out
 
       - name: Release
