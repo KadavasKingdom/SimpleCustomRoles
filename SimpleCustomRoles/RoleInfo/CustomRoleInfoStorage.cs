@@ -200,7 +200,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
             if (!effect.CanEnable)
                 continue;
             // this time seems good I guess.
-            Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration);
+            Timing.CallDelayed(0.2f, () => Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration));
         }
         Owner.IsBypassEnabled = Role.Extra.Bypass;
         if (Role.Extra.OpenDoorsNextToSpawn)
@@ -209,9 +209,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
                 return;
 
             foreach (var door in Owner.Room.Doors)
-            {
                 door.IsOpened = true;
-            }
         }
     }
 
