@@ -6,16 +6,14 @@ using SimpleCustomRoles.Helpers;
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(ClientCommandHandler))]
-[CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class OptOutCustomRole : ICommand
+[CommandHandler(typeof(SCRComandBase))]
+public class OptOutCommand : ICommand
 {
-    public string Command => "optoutscr";
+    public string Command => "optout";
 
-    public string[] Aliases => ["optoutscr", "scr_quit"];
+    public string[] Aliases => ["optoutscr", "quit"];
 
     public string Description => "Opting out from current Custom Role";
-
-    public bool SanitizeResponse => true;
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
@@ -24,8 +22,8 @@ public class OptOutCustomRole : ICommand
             response = "Must be coming from Player!";
             return false;
         }
-        var player = Player.List.Where(x => x.UserId == pcs.SenderId).FirstOrDefault();
-        if (player == null)
+        var player = Player.Get(pcs);
+        if (player == null || player.IsHost)
         {
             response = "Must be coming from Player!";
             return false;

@@ -1,14 +1,15 @@
 ﻿using CommandSystem;
+using LabApi.Features.Permissions;
 using SimpleCustomRoles.Handler;
 
 namespace SimpleCustomRoles.Commands;
 
-[CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class ReloadCustomRoles : ICommand
+[CommandHandler(typeof(SCRComandBase))]
+public class ReloadCommand : ICommand
 {
-    public string Command => "reloadscr";
+    public string Command => "reload";
 
-    public string[] Aliases => ["reloadsimplecustomrole", "scr_reload"];
+    public string[] Aliases => [];
 
     public string Description => "Reload the Custom Role Names";
 
@@ -16,7 +17,7 @@ public class ReloadCustomRoles : ICommand
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!sender.CheckPermission(PlayerPermissions.PlayersManagement))
+        if (!sender.HasPermissions("scr.reload"))
         {
             response = "You dont have permission!";
             return false;

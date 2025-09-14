@@ -16,4 +16,6 @@ public class ExtraInfo
     public bool ForceSet { get; set; } = false;
 
     public bool CannotRevivedByScp049 { get; set; } = false;
+
+    public bool HideFromSpectators { get; set; } = false;
 }

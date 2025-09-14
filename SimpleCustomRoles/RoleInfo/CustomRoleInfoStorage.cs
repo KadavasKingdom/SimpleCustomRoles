@@ -8,6 +8,7 @@ using PlayerRoles.PlayableScps.Scp049;
 using PlayerRoles.PlayableScps.Scp106;
 using PlayerRoles.PlayableScps.Scp1507;
 using PlayerRoles.PlayableScps.Scp939;
+using PlayerRoles.Spectating;
 using PlayerStatsSystem;
 using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleYaml;
@@ -211,6 +212,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
             foreach (var door in Owner.Room.Doors)
                 door.IsOpened = true;
         }
+        SpectatableVisibilityManager.SetHidden(Owner.ReferenceHub, Role.Extra.HideFromSpectators);
     }
 
     private void SetFpc()
@@ -230,13 +232,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         //  Appearance
         if (Role.Fpc.Appearance != PlayerRoles.RoleTypeId.None)
         {
-            /*
-            foreach (var item in Player.ReadyList.Where(x => x != Owner))
-            {
-                FpcServerPositionDistributor.SendRole(item.ReferenceHub, Owner.ReferenceHub, Role.Fpc.Appearance);
-            }
-            */
-            //AppearanceSyncExtension.AddPlayer(Owner, Role.Fpc.Appearance);
+            Owner.AddFakeRole(Role.Fpc.Appearance);
         }
         // Voice Channel
         if (Role.Fpc.VoiceChatChannel != VoiceChat.VoiceChatChannel.None)

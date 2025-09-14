@@ -1,29 +1,26 @@
 ﻿using CommandSystem;
+using LabApi.Features.Permissions;
 using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Commands;
 
-[CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class ShowCurCustomRole : ICommand
+[CommandHandler(typeof(SCRComandBase))]
+public class ShowCommand : ICommand
 {
-    public string Command => "scrcur";
-
-    public string[] Aliases => ["simplecustomrolecurrently", "scr_current", "scr_cur"];
-
+    public string Command => "show";
+    public string[] Aliases => ["current", "cur"];
     public string Description => "List currently what player is which role.";
-
-    public bool SanitizeResponse => true;
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!sender.CheckPermission(PlayerPermissions.PlayersManagement))
+        if (!sender.HasPermissions("scr.show"))
         {
             response = "You dont have permission!";
             return false;
         }
 
         var players = CustomRoleHelpers.GetPlayers();
-        if (players.Count() == 0)
+        if (players.Count == 0)
         {
             response = $"There is no Custom Roles.";
             return true;
