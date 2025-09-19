@@ -9,6 +9,7 @@ on:
 env:
   REFERENCES_URL: https://exmod-team.github.io/SL-References/Dev.zip
   REFERENCES_PATH: ${{ github.workspace }}/References
+  ProjName: SimpleCustomRoles
 
 jobs:
   build:

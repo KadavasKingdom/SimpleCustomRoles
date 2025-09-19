@@ -11,7 +11,7 @@ public class OptOutCommand : ICommand
 {
     public string Command => "optout";
 
-    public string[] Aliases => ["optoutscr", "quit"];
+    public string[] Aliases => ["optoutscr"];
 
     public string Description => "Opting out from current Custom Role";
 

@@ -12,7 +12,7 @@ internal class SetFakeRoleCommand : ICommand, IUsageProvider
 
     public string[] Aliases => [];
 
-    public string Description => "set role to fakerole";
+    public string Description => "Faking a role to the players. (None will remove it)";
 
     public string[] Usage => ["%role%", "%player%"];
 
