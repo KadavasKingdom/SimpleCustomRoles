@@ -36,13 +36,24 @@ jobs:
       run: |
           Rename-Item -Path "${{ env.REFERENCES_PATH }}\Assembly-CSharp-Publicized.dll" -NewName "Assembly-CSharp.dll"
           
-    - name: Build
+    - name: Build SimpleCustomRoles
       env:
         SL_REFERENCES: ${{ env.REFERENCES_PATH }}
-      run: dotnet build -o Out
+      run: dotnet build ${{ env.ProjName }}/${{ env.ProjName }}.csproj -o Out
 
-    - name : Upload
+    - name : Upload SimpleCustomRoles
       uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ env.ProjName }}
+        path: Out/*
+
+    - name: Build SimpleCustomRoles.EffectOnHud
+      env:
+        SL_REFERENCES: ${{ env.REFERENCES_PATH }}
+      run: dotnet build ${{ env.ProjName }}.EffectOnHud/${{ env.ProjName }}.EffectOnHud.csproj -o Out
+
+    - name : Upload SimpleCustomRoles.EffectOnHud
+      uses: actions/upload-artifact@v4.3.5
+      with:
+        name: ${{ env.ProjName }}.EffectOnHud
         path: Out/*
