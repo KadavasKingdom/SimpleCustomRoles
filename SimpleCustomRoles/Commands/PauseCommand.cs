@@ -1,23 +1,25 @@
 ﻿using CommandSystem;
+using LabApi.Features.Permissions;
 
 namespace SimpleCustomRoles.Commands;
 
-[CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class PauseCustomRole : ICommand
+[CommandHandler(typeof(SCRComandBase))]
+public class PauseCommand : ICommand
 {
-    public string Command => "pausescr";
-
-    public string[] Aliases => ["pausecustomrole", "scr_pause"];
-
+    public string Command => "pause";
+    public string[] Aliases => [];
     public string Description => "Pause or resume custom roles";
-
-    public bool SanitizeResponse => true;
-
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
+        if (!sender.HasPermissions("scr.pause"))
+        {
+            response = "You do not have a permission for this";
+            return false;
+        }
+
         if (arguments.Count == 1)
         {
-            var arg0 = arguments.Array[1];
+            var arg0 = arguments.At(0);
 
             if (arg0 == "off" || arg0 == "false" || arg0 == "0")
             {
@@ -31,7 +33,6 @@ public class PauseCustomRole : ICommand
                 response = "Custom Roles spawn are now resumed";
                 return true;
             }
-
         }
         else
         {

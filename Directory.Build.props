@@ -10,13 +10,13 @@
 		<DebugType>pdbonly</DebugType>
 		<Optimize>true</Optimize>
 		<Copyright>SlejmUr</Copyright>
-		<Version>0.5.7</Version>
+		<Version>0.5.8</Version>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
 		<PackageReference Include="Lib.Harmony" Version="2.2.2" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
-		<PackageReference Include="Northwood.LabAPI" Version="1.1.1" Publicize="true" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
+		<PackageReference Include="Northwood.LabAPI" Version="1.1.2" Publicize="true" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp" Publicize="true" Private="false" />

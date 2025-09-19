@@ -1,4 +1,6 @@
-﻿namespace SimpleCustomRoles.RoleYaml.SCP;
+﻿using PlayerRoles.PlayableScps.Scp173;
+
+namespace SimpleCustomRoles.RoleYaml.SCP;
 
 public class Scp173Info
 {
@@ -16,4 +18,8 @@ public class Scp173Info
 
     public MathValueFloat BlinkDistance { get; set; } = new();
     public MathValueFloat BreakneckDistanceMultiplier { get; set; } = new();
+
+    public bool CanTeleport { get; set; } = true;
+
+    public List<Scp173AudioPlayer.Scp173SoundId> DisableSoundPlay { get; set; } = [];
 }

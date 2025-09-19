@@ -7,6 +7,7 @@ on:
 env:
   REFERENCES_URL: https://exmod-team.github.io/SL-References/Dev.zip
   REFERENCES_PATH: ${{ github.workspace }}/References
+  ProjName: SimpleCustomRoles
 
 jobs:
   publish:
@@ -36,7 +37,7 @@ jobs:
       - name: Build
         env:
           SL_REFERENCES: ${{ env.REFERENCES_PATH }}
-        run: dotnet build -o Out
+        run: dotnet build ${{ env.ProjName }}/${{ env.ProjName }}.csproj -o Out
 
       - name : Upload
         uses: actions/upload-artifact@v4.3.5
