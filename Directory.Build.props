@@ -10,7 +10,7 @@
 		<DebugType>pdbonly</DebugType>
 		<Optimize>true</Optimize>
 		<Copyright>SlejmUr</Copyright>
-		<Version>0.5.7</Version>
+		<Version>0.5.8</Version>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
 	<ItemGroup>
