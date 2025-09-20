@@ -61,7 +61,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         MoveToLocation();
         yield return Timing.WaitForSeconds(0.2f);
         SetInventory();
-        SetHints();
+        SetHints(true);
         yield return Timing.WaitForSeconds(0.2f);
         SetMaxStats();
         yield return Timing.WaitForSeconds(0.1f);
@@ -242,7 +242,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         }
     }
 
-    internal void SetHints()
+    internal void SetHints(bool sendall)
     {
         bool useOriginal = true;
         if (!string.IsNullOrEmpty(Role.Hint.Broadcast))
@@ -259,7 +259,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
             if (useOriginal)
                 Owner.SendHint(Role.Hint.Hint, Role.Hint.HintDuration);
         }
-        if (!string.IsNullOrEmpty(Role.Hint.BroadcastAll))
+        if (!string.IsNullOrEmpty(Role.Hint.BroadcastAll) && sendall)
         {
             useOriginal = true;
             Events.TriggerShowBroadcastAll(Owner, Role, ref useOriginal);
