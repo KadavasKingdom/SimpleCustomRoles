@@ -42,7 +42,7 @@ internal class Logic
 
         if (@base is SSKeybindSetting { SyncIsPressed: true } keybindSetting && keybindSetting.SettingId == showRolekb.SettingId)
         {
-            storage.SetHints();
+            storage.SetHints(false);
         }
 
     }
