@@ -4,6 +4,7 @@ using InventorySystem.Items.Firearms.Modules;
 using LabApi.Features.Stores;
 using LabApi.Features.Wrappers;
 using MEC;
+using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp049;
 using PlayerRoles.PlayableScps.Scp106;
 using PlayerRoles.PlayableScps.Scp1507;
@@ -19,7 +20,6 @@ namespace SimpleCustomRoles.RoleInfo;
 
 public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 {
-    private bool onDefaultScale;
     public CustomRoleBaseInfo Role;
     public string OldCustomInfo = string.Empty;
     public bool ResetRole { get; set; }
@@ -36,21 +36,12 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         Owner.IsBypassEnabled = false;
         ScaleHelper.SetScale(Owner, Vector3.one);
         Owner.Position += Vector3.up;
+        Owner.Gravity = FpcGravityController.DefaultGravity;
         if (string.IsNullOrEmpty(OldCustomInfo))
             OldCustomInfo = string.Empty;
         Owner.CustomInfo = OldCustomInfo;
         if (ResetRole)
             Owner.SetRole(Owner.Role, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
-    }
-
-    public void ChangeScale()
-    {
-        Vector3 scale = Role.Fpc.Scale;
-        if (!onDefaultScale)
-            scale = Vector3.one;
-        ScaleHelper.SetScale(Owner, scale);
-
-        onDefaultScale = !onDefaultScale;
     }
 
     internal IEnumerator<float> ApplyCor()

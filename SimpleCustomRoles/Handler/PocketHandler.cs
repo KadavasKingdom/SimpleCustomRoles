@@ -1,11 +1,15 @@
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
+using LabApi.Features.Wrappers;
 using SimpleCustomRoles.Helpers;
+using UnityEngine;
 
 namespace SimpleCustomRoles.Handler;
 
 public class PocketHandler : CustomEventsHandler
 {
+    private static readonly Dictionary<Player, Vector3> PlayerToScale = [];
+
     public override void OnPlayerEnteringPocketDimension(PlayerEnteringPocketDimensionEventArgs ev)
     {
         if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -15,9 +19,8 @@ public class PocketHandler : CustomEventsHandler
 
     public override void OnPlayerEnteredPocketDimension(PlayerEnteredPocketDimensionEventArgs ev)
     {
-        if (!CustomRoleHelpers.TryGetCustomRoleStorage(ev.Player, out var storage))
-            return;
-        storage.ChangeScale();
+        PlayerToScale[ev.Player] = ev.Player.Scale;
+        ScaleHelper.SetScale(ev.Player, Vector3.one);
     }
 
     public override void OnPlayerLeavingPocketDimension(PlayerLeavingPocketDimensionEventArgs ev)
@@ -31,10 +34,12 @@ public class PocketHandler : CustomEventsHandler
 
     public override void OnPlayerLeftPocketDimension(PlayerLeftPocketDimensionEventArgs ev)
     {
-        if (!CustomRoleHelpers.TryGetCustomRoleStorage(ev.Player, out var storage))
-            return;
         if (!ev.IsSuccessful)
             return;
-        storage.ChangeScale();
+        if (PlayerToScale.TryGetValue(ev.Player, out Vector3 scale))
+        {
+            ScaleHelper.SetScale(ev.Player, scale);
+            PlayerToScale.Remove(ev.Player);
+        }
     }
 }
