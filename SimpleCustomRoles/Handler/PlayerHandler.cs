@@ -1,4 +1,5 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using CustomPlayerEffects;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Stores;
@@ -55,6 +56,8 @@ public class PlayerHandler : CustomEventsHandler
         if (ev.OldTarget is not null && CustomRoleHelpers.Contains(ev.OldTarget))
         {
             ev.Player.ClearBroadcasts();
+            //Base game applies the shader of Fog Control to spectators without granting the effect, effectively giving all spectators Fog Control forever until they restart their games. This fixes that. - Kad
+            ev.Player.EnableEffect<FogControl>(2, 0.1f);
         }
         if (ev.NewTarget is not null && CustomRoleHelpers.TryGetCustomRole(ev.NewTarget, out var role))
         {
@@ -213,6 +216,7 @@ public class PlayerHandler : CustomEventsHandler
         foreach (var item in ev.Players)
         {
             CustomRoleHelpers.UnSetCustomInfoToPlayer(item);
+            item.EnableEffect<FogControl>(2, 0.1f);
         }
         foreach (var item in Main.Instance.InWaveRoles.Where(x => x.Wave.Faction == ev.Wave.Faction && x.RoleType == CustomRoleType.InWave))
         {
