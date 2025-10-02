@@ -1,4 +1,5 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using CustomPlayerEffects;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Stores;
@@ -15,7 +16,8 @@ public class PlayerHandler : CustomEventsHandler
 {
     public override void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
     {
-        ev.Player.ClearBroadcasts();
+        if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.Destroyed)
+            ev.Player.ClearBroadcasts();
         PlayerEscaped.Remove(ev.Player);
         if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.None)
             CustomRoleHelpers.UnSetCustomInfoToPlayer(ev.Player, false);
@@ -54,6 +56,7 @@ public class PlayerHandler : CustomEventsHandler
             return;
         if (ev.OldTarget is not null && CustomRoleHelpers.Contains(ev.OldTarget))
         {
+            ev.Player.EnableEffect<FogControl>(2, 0.1f);
             ev.Player.ClearBroadcasts();
         }
         if (ev.NewTarget is not null && CustomRoleHelpers.TryGetCustomRole(ev.NewTarget, out var role))
@@ -212,6 +215,7 @@ public class PlayerHandler : CustomEventsHandler
         List<CustomRoleBaseInfo> tmp = [];
         foreach (var item in ev.Players)
         {
+            item.EnableEffect<FogControl>(2, 0.1f);
             CustomRoleHelpers.UnSetCustomInfoToPlayer(item);
         }
         foreach (var item in Main.Instance.InWaveRoles.Where(x => x.Wave.Faction == ev.Wave.Faction && x.RoleType == CustomRoleType.InWave))
