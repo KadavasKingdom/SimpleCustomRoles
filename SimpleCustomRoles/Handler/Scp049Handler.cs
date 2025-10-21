@@ -1,5 +1,6 @@
 ﻿using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Events.CustomHandlers;
+using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
 
@@ -7,6 +8,12 @@ namespace SimpleCustomRoles.Handler;
 
 public class Scp049Handler : CustomEventsHandler
 {
+    public override void OnScp049Attacking(Scp049AttackingEventArgs ev)
+    {
+        if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role) && role != null)
+            ev.CooldownTime = role.Scp.Scp049.AttackCooldownTime.MathCalculation(ev.CooldownTime);
+    }
+
     public override void OnScp049ResurrectingBody(Scp049ResurrectingBodyEventArgs ev)
     {
         if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))

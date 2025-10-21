@@ -10,13 +10,13 @@
 		<DebugType>pdbonly</DebugType>
 		<Optimize>true</Optimize>
 		<Copyright>SlejmUr</Copyright>
-		<Version>0.5.9</Version>
+		<Version>0.5.10</Version>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
 		<PackageReference Include="Lib.Harmony" Version="2.2.2" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
-		<PackageReference Include="Northwood.LabAPI" Version="1.1.2" Publicize="true" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true" />
+		<PackageReference Include="YamlDotNet" Version="11.0.1" PrivateAssets="all" ExcludeAssets="runtime" ReferenceOutputAssembly="false" Private="true"  />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp" Publicize="true" Private="false" />
@@ -24,6 +24,7 @@
 		<Reference Include="CommandSystem.Core" Private="false" />
 		<Reference Include="Mirror" Private="false" />
 		<Reference Include="Pooling" Private="false" />
+		<Reference Include="LabApi" Publicize="true" Private="false" />
 		<Reference Include="UnityEngine" Private="false" />
 		<Reference Include="UnityEngine.CoreModule" Private="false" />
 		<Reference Include="UnityEngine.PhysicsModule" Private="false" />

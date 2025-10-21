@@ -8,8 +8,8 @@ namespace SimpleCustomRoles;
 public static class CustomYaml
 {
     public static ISerializer Serializer { get; } = new SerializerBuilder()
-        .WithEmissionPhaseObjectGraphVisitor((EmissionPhaseObjectGraphVisitorArgs visitor) => new CommentsObjectGraphVisitor(visitor.InnerVisitor))
-        .WithTypeInspector((ITypeInspector typeInspector) => new CommentGatheringTypeInspector(typeInspector))
+        .WithEmissionPhaseObjectGraphVisitor(visitor => new CommentsObjectGraphVisitor(visitor.InnerVisitor))
+        .WithTypeInspector(typeInspector => new CommentGatheringTypeInspector(typeInspector))
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .DisableAliases()
         .IgnoreFields()
