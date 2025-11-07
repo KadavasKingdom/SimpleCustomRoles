@@ -16,6 +16,7 @@ using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
 using UnityEngine;
+using UserSettings;
 
 namespace SimpleCustomRoles.RoleInfo;
 
@@ -167,12 +168,24 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 #if ENABLEEFFECTHUD
         float originalMaxHealth = Owner.MaxHealth;
 #endif
-        Owner.MaxHealth = Role.Stats.MaxHealth.MathCalculation(Owner.MaxHealth);
-        Owner.MaxArtificialHealth = Role.Stats.MaxAhp.MathCalculation(Owner.MaxArtificialHealth);
-        Owner.MaxHumeShield = Role.Stats.MaxHumeShield.MathCalculation(Owner.MaxHumeShield);
-        var max = Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue;
-        max = Role.Stats.MaxStamina.MathCalculation(max);
-        Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = max;
+
+        float newValue = Role.Stats.MaxHealth.MathCalculation(Owner.MaxHealth);
+        if (newValue != Owner.MaxHealth)
+            Owner.MaxHealth = newValue;
+
+        newValue = Role.Stats.MaxAhp.MathCalculation(Owner.MaxArtificialHealth);
+        if (newValue != Owner.MaxArtificialHealth)
+            Owner.MaxArtificialHealth = newValue;
+
+        newValue = Role.Stats.MaxHumeShield.MathCalculation(Owner.MaxHumeShield);
+        if (newValue != Owner.MaxHumeShield)
+            Owner.MaxHumeShield = newValue;
+
+        var maxStat = Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue;
+        newValue = Role.Stats.MaxStamina.MathCalculation(maxStat);
+        if (newValue != maxStat)
+            Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = newValue;
+
 #if ENABLEEFFECTHUD
         EffectOnHUD.ShowEffects.AddHpModifier(Owner, "Custom Role", (int)(Owner.MaxHealth - originalMaxHealth));
 #endif
@@ -180,13 +193,28 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 
     private void SetStats()
     {
-        Owner.Health = Role.Stats.Health.MathCalculation(Owner.Health);
-        Owner.ArtificialHealth = Role.Stats.Ahp.MathCalculation(Owner.ArtificialHealth);
-        Owner.HumeShield = Role.Stats.HumeShield.MathCalculation(Owner.HumeShield);
+        var newValue = Role.Stats.Health.MathCalculation(Owner.Health);
+        if (newValue != Owner.Health)
+            Owner.Health = newValue;
+
+        newValue = Role.Stats.Ahp.MathCalculation(Owner.ArtificialHealth);
+        if (newValue != Owner.ArtificialHealth)
+            Owner.ArtificialHealth = newValue;
+
+        newValue = Role.Stats.HumeShield.MathCalculation(Owner.HumeShield);
+        if (newValue != Owner.HumeShield)
+            Owner.HumeShield = newValue;
+
         Owner.Gravity = Role.Stats.Gravity;
 
-        Owner.HumeShieldRegenRate = Role.Stats.HumeShieldRegenRate.MathCalculation(Owner.HumeShieldRegenRate);
-        Owner.HumeShieldRegenCooldown = Role.Stats.HumeShieldRegenCooldown.MathCalculation(Owner.HumeShieldRegenCooldown);
+        newValue = Role.Stats.HumeShieldRegenRate.MathCalculation(Owner.HumeShieldRegenRate);
+        if (newValue != Owner.HumeShieldRegenRate)
+            Owner.HumeShieldRegenRate = newValue;
+
+        newValue = Role.Stats.HumeShieldRegenCooldown.MathCalculation(Owner.HumeShieldRegenCooldown);
+        if (newValue != Owner.HumeShieldRegenCooldown)
+            Owner.HumeShieldRegenCooldown = newValue;
+
 
         if (Owner.RoleBase is IHumeShieldedRole humeShieldedRole && humeShieldedRole.HumeShieldModule is DynamicHumeShieldController dynamicShield)
         {
