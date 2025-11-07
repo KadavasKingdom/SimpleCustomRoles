@@ -5,6 +5,7 @@ using LabApi.Features.Stores;
 using LabApi.Features.Wrappers;
 using MEC;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.HumeShield;
 using PlayerRoles.PlayableScps.Scp049;
 using PlayerRoles.PlayableScps.Scp106;
 using PlayerRoles.PlayableScps.Scp1507;
@@ -183,6 +184,20 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         Owner.ArtificialHealth = Role.Stats.Ahp.MathCalculation(Owner.ArtificialHealth);
         Owner.HumeShield = Role.Stats.HumeShield.MathCalculation(Owner.HumeShield);
         Owner.Gravity = Role.Stats.Gravity;
+
+        Owner.HumeShieldRegenRate = Role.Stats.HumeShieldRegenRate.MathCalculation(Owner.HumeShieldRegenRate);
+        Owner.HumeShieldRegenCooldown = Role.Stats.HumeShieldRegenCooldown.MathCalculation(Owner.HumeShieldRegenCooldown);
+
+        if (Owner.RoleBase is IHumeShieldedRole humeShieldedRole && humeShieldedRole.HumeShieldModule is DynamicHumeShieldController dynamicShield)
+        {
+            if (Role.Stats.ClearShieldOverHealth)
+                dynamicShield.ShieldOverHealth.ClearKeys();
+
+            foreach (var item in Role.Stats.ShieldOverHealth)
+            {
+                dynamicShield.ShieldOverHealth.AddKey(item.Key, item.Value);
+            }
+        }
     }
 
     private void SetCommon()

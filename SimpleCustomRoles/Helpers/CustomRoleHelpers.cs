@@ -65,13 +65,19 @@ public static class CustomRoleHelpers
         CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename} Success", Main.Instance.Config.Debug);
     }
 
-    public static void UnSetCustomInfoToPlayer(Player player, bool resetRole = true)
+    public static void UnSetCustomInfoToPlayer(Player player, bool resetRole = true, bool fromOptOut = false)
     {
         if (player == null)
             return;
         if (!Contains(player))
             return;
         var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
+
+        bool shouldrun = true;
+        Events.TriggerRoleRemoving(player, rolestorage.Role, fromOptOut, ref shouldrun);
+        if (!shouldrun)
+            return;
+
         rolestorage.ResetRole = resetRole;
         Events.TriggerRoleRemoved(player, rolestorage.Role);
         rolestorage.Reset();

@@ -29,4 +29,5 @@ public class CustomRoleBaseInfo
     public Dictionary<KillerRoleInfo, NewRoleInfo> KillerToNewRole { get; set; } = [];
     public ExtraInfo Extra { get; set; } = new();
     public PocketInfo Pocket { get; set; } = new();
+    public TicketInfo Ticket { get; set; } = new();
 }

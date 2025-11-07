@@ -28,7 +28,7 @@ public class OptOutCommand : ICommand
             response = "Must be coming from Player!";
             return false;
         }
-        CustomRoleHelpers.UnSetCustomInfoToPlayer(player);
+        CustomRoleHelpers.UnSetCustomInfoToPlayer(player, fromOptOut: true);
         response = "Sucessfully opted out from Custom Roles";
         return true;
     }

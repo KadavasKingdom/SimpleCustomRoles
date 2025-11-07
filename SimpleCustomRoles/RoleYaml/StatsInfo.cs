@@ -12,4 +12,8 @@ public class StatsInfo
     public MathValueFloat MaxHumeShield { get; set; } = new();
     public Vector3 Gravity { get; set; } = new(0f, -19.6f, 0f);
     public MathValueFloat MaxStamina { get; set; } = new();
+    public MathValueFloat HumeShieldRegenRate { get; set; } = new();
+    public MathValueFloat HumeShieldRegenCooldown { get; set; } = new();
+    public Dictionary<float, float> ShieldOverHealth { get; set; } = [];
+    public bool ClearShieldOverHealth { get; set; } = false;
 }

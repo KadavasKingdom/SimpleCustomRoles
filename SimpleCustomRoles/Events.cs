@@ -14,6 +14,8 @@ public static class Events
     public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnShowBroadcast;
     public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnShowBroadcastAll;
 
+    public static event Action<Player, CustomRoleBaseInfo, bool, TypeWrapper<bool>> OnRoleRemoving;
+
     internal static void TriggerRoleAdded(Player player, CustomRoleBaseInfo role)
         => OnRoleAdded?.Invoke(player, role);
 
@@ -41,6 +43,13 @@ public static class Events
     {
         TypeWrapper<bool> runOriginalHelper = runOriginal;
         OnShowBroadcastAll?.Invoke(player, role, runOriginalHelper);
+        runOriginal = runOriginalHelper;
+    }
+
+    internal static void TriggerRoleRemoving(Player player, CustomRoleBaseInfo role,  bool optOut, ref bool runOriginal)
+    {
+        TypeWrapper<bool> runOriginalHelper = runOriginal;
+        OnRoleRemoving?.Invoke(player, role, optOut, runOriginalHelper);
         runOriginal = runOriginalHelper;
     }
 }
