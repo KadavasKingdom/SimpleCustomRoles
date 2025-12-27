@@ -97,6 +97,12 @@ internal class ServerHandler : CustomEventsHandler
                 CL.Debug($"Rolled chance: {random}/{chance} for Role {item.Rolename}. Role is " + (IsSpawning ? "" : "NOT ") + "spawning.", Main.Instance.Config.Debug);
             }
         }
+
+        foreach (var item in RegularRoles.Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
+        {
+            GroupHelper.DenyCustomRoles(item.Rolegroup, ref RegularRoles);
+        }
+
         List<Player> NotRoll = [];
         Timing.CallDelayed(0.2f, () =>
         {

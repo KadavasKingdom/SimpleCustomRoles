@@ -1,11 +1,9 @@
 ﻿using CommandSystem;
 using LabApi.Features.Wrappers;
-using RemoteAdmin;
 using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Commands;
 
-[CommandHandler(typeof(ClientCommandHandler))]
 [CommandHandler(typeof(SCRComandBase))]
 public class OptOutCommand : ICommand
 {
@@ -17,18 +15,19 @@ public class OptOutCommand : ICommand
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (sender is not PlayerCommandSender pcs)
-        {
-            response = "Must be coming from Player!";
-            return false;
-        }
-        var player = Player.Get(pcs);
+        var player = Player.Get(sender);
         if (player == null || player.IsHost)
         {
             response = "Must be coming from Player!";
             return false;
         }
-        CustomRoleHelpers.UnSetCustomInfoToPlayer(player, fromOptOut: true);
+        CL.Info($"Opting out player: {player.PlayerId}");
+        bool result = CustomRoleHelpers.UnSetCustomInfoToPlayer(player, fromOptOut: true);
+        if (!result)
+        {
+            response = "You cannot opt out!";
+            return false;
+        }
         response = "Sucessfully opted out from Custom Roles";
         return true;
     }

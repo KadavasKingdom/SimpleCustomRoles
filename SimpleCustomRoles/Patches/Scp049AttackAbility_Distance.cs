@@ -8,7 +8,7 @@ using static HarmonyLib.AccessTools;
 
 namespace SimpleCustomRoles.Patches;
 
-[HarmonyPatch(typeof(Scp049AttackAbility), nameof(Scp049AttackAbility.CanFindTarget))]
+[HarmonyPatch(typeof(Scp049AttackAbility), nameof(Scp049AttackAbility.CanFindTarget))] // This is client only still.
 [HarmonyPatch(typeof(Scp049AttackAbility), nameof(Scp049AttackAbility.IsTargetValid))]
 internal static class Scp049AttackAbility_Distance
 {

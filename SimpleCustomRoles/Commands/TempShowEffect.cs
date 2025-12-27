@@ -23,7 +23,7 @@ public class TempShowEffect : ICommand
             response = "Must be coming from Player!";
             return false;
         }
-        var player = Player.List.Where(x => x.UserId == pcs.SenderId).FirstOrDefault();
+        var player = Player.Get(pcs);
         if (player == null)
         {
             response = "Must be coming from Player!";

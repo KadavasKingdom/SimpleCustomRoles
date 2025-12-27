@@ -16,6 +16,8 @@ public static class Events
 
     public static event Action<Player, CustomRoleBaseInfo, bool, TypeWrapper<bool>> OnRoleRemoving;
 
+    public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnEscaping;
+
     internal static void TriggerRoleAdded(Player player, CustomRoleBaseInfo role)
         => OnRoleAdded?.Invoke(player, role);
 
@@ -46,10 +48,17 @@ public static class Events
         runOriginal = runOriginalHelper;
     }
 
-    internal static void TriggerRoleRemoving(Player player, CustomRoleBaseInfo role,  bool optOut, ref bool runOriginal)
+    internal static void TriggerRoleRemoving(Player player, CustomRoleBaseInfo role, bool optOut, ref bool runOriginal)
     {
         TypeWrapper<bool> runOriginalHelper = runOriginal;
         OnRoleRemoving?.Invoke(player, role, optOut, runOriginalHelper);
+        runOriginal = runOriginalHelper;
+    }
+
+    internal static void TriggerOnEscaping(Player player, CustomRoleBaseInfo role, ref bool runOriginal)
+    {
+        TypeWrapper<bool> runOriginalHelper = runOriginal;
+        OnEscaping?.Invoke(player, role, runOriginalHelper);
         runOriginal = runOriginalHelper;
     }
 }

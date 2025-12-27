@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 using static HarmonyLib.AccessTools;
 
 namespace SimpleCustomRoles.Patches;
-// DISABLED FUCK IL CODE
+
 
 [HarmonyPatch(typeof(Scp049ResurrectAbility), nameof(Scp049ResurrectAbility.CheckBeginConditions))]
 internal static class Scp049ResurrectAbility_CheckBeginConditions

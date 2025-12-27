@@ -2,11 +2,9 @@
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
-using LabApi.Features.Stores;
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
-using SimpleCustomRoles.RoleInfo;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
 
@@ -135,10 +133,13 @@ public class PlayerHandler : CustomEventsHandler
     }
 
     public static HashSet<Player> PlayerEscaped = [];
+    public static HashSet<Player> NeverEscape = [];
 
     public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
     {
         Player player = ev.Player;
+        if (NeverEscape.Contains(player))
+            return;
         if (PlayerEscaped.Contains(player))
             return;
         List<Pickup> droppedItems = [];
@@ -187,8 +188,11 @@ public class PlayerHandler : CustomEventsHandler
         var roleToEscapeTo = potentialCustomEscapeRoles.Select(static x => x.Value).FirstOrDefault();
         if (roleToEscapeTo == default)
             return;
+        bool RunOriginal = true;
+        Events.TriggerOnEscaping(player, role, ref RunOriginal);
+        if (!RunOriginal)
+            return;
         ev.IsAllowed = false;
-        CustomRoleInfoStorage storage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
         foreach (var item in player.Items.ToList())
         {
             if (item is Scp1344Item scp1344Item)

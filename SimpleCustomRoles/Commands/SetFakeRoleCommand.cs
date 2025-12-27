@@ -20,20 +20,20 @@ internal class SetFakeRoleCommand : ICommand, IUsageProvider
     {
         if (arguments.Count != 2)
         {
-            response = "req 2 arg!";
+            response = "This command equires 2 arguments! " + HelpProviderExtensions.DisplayCommandUsage(this);
             return false;
         }
         string role = arguments.At(0);
         if (!Enum.TryParse(role, true, out RoleTypeId roleType))
         {
-            response = "cannot parse roletypeid!";
+            response = "Cannot parse the RoleTypeId!";
             return false;
         }
 
         List<Player> players = [.. RAUtils.ProcessPlayerIdOrNamesList(arguments, 1, out _).Select(Player.Get)];
         if (players.Count == 0)
         {
-            response = "No players!";
+            response = "No players found!";
             return false;
         }
 
