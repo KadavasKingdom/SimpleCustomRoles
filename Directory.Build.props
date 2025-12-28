@@ -24,6 +24,7 @@
 		<Reference Include="CommandSystem.Core" Private="false" />
 		<Reference Include="Mirror" Private="false" />
 		<Reference Include="Pooling" Private="false" />
+		<Reference Include="NorthwoodLib" Private="false" />
 		<Reference Include="LabApi" Publicize="true" Private="false" />
 		<Reference Include="UnityEngine" Private="false" />
 		<Reference Include="UnityEngine.CoreModule" Private="false" />

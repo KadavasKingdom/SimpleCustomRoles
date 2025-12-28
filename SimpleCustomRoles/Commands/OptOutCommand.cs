@@ -21,11 +21,11 @@ public class OptOutCommand : ICommand
             response = "Must be coming from Player!";
             return false;
         }
-        CL.Info($"Opting out player: {player.PlayerId}");
-        bool result = CustomRoleHelpers.UnSetCustomInfoToPlayer(player, fromOptOut: true);
+
+        bool result = CustomRoleHelpers.UnSetCustomInfoToPlayer(player, out response, fromOptOut: true);
+        CL.Info($"Opting out player: {player.PlayerId} Result: {result}");
         if (!result)
         {
-            response = "You cannot opt out!";
             return false;
         }
         response = "Sucessfully opted out from Custom Roles";

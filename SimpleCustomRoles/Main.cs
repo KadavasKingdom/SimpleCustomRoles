@@ -28,14 +28,12 @@ internal class Main : Plugin<Config>
     public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
     public List<CustomRoleBaseInfo> EscapeRoles = [];
 
-    private readonly ServerHandler serverHandler = new();
-    private readonly PocketHandler pocketHandler = new();
-    private readonly PlayerHandler playerHandler = new();
-    private readonly Scp0492Handler scp0492Handler = new();
-    private readonly Scp049Handler scp049Handler = new();
-    private readonly Scp096Handler scp096Handler = new();
-    private readonly Scp173Handler scp173Handler = new();
-    private readonly Scp330Handler scp330Handler = new();
+    private readonly List<CustomEventsHandler> handlers = 
+    [
+        new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
+        new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
+        new Scp173Handler(), new Scp330Handler(),
+    ];
 
     public List<RoleBaseGroup> RoleGroups = [];
 
@@ -48,14 +46,10 @@ internal class Main : Plugin<Config>
         HelperTxts.WriteAll();
         Logic.Init();
 
-        CustomHandlersManager.RegisterEventsHandler(serverHandler);
-        CustomHandlersManager.RegisterEventsHandler(playerHandler);
-        CustomHandlersManager.RegisterEventsHandler(pocketHandler);
-        CustomHandlersManager.RegisterEventsHandler(scp049Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp0492Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp096Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp173Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp330Handler);
+        foreach (var item in handlers)
+        {
+            CustomHandlersManager.RegisterEventsHandler(item);
+        }
 
         StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
         Harmony.DEBUG = Config.Debug;
@@ -68,14 +62,10 @@ internal class Main : Plugin<Config>
     {
         StatusEffectBase.OnEnabled -= SubHandle.StatusEffectBase_OnEnabled;
 
-        CustomHandlersManager.RegisterEventsHandler(serverHandler);
-        CustomHandlersManager.RegisterEventsHandler(playerHandler);
-        CustomHandlersManager.RegisterEventsHandler(pocketHandler);
-        CustomHandlersManager.RegisterEventsHandler(scp049Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp0492Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp096Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp173Handler);
-        CustomHandlersManager.RegisterEventsHandler(scp330Handler);
+        foreach (var item in handlers)
+        {
+            CustomHandlersManager.UnregisterEventsHandler(item);
+        }
 
         Logic.UnInit();
         RolesLoader.Clear();

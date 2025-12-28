@@ -14,9 +14,11 @@ public class PlayerHandler : CustomEventsHandler
 {
     public override void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
     {
+        if (ev.Player == null)
+            return;
+        EscapeHandler.PlayerEscaped.Remove(ev.Player);
         if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.Destroyed)
             ev.Player.ClearBroadcasts();
-        PlayerEscaped.Remove(ev.Player);
         if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.None)
             CustomRoleHelpers.UnSetCustomInfoToPlayer(ev.Player, false);
     }
@@ -25,8 +27,10 @@ public class PlayerHandler : CustomEventsHandler
     {
         if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
             return;
+
         if (!role.Deniable.Items.TryGetValue(ev.Item.Type, out var deniable))
             return;
+
         ev.IsAllowed = deniable.CanDrop;
     }
 
@@ -130,86 +134,6 @@ public class PlayerHandler : CustomEventsHandler
                 ev.Player.Position = ev.Attacker.Position;
             });
         }
-    }
-
-    public static HashSet<Player> PlayerEscaped = [];
-    public static HashSet<Player> NeverEscape = [];
-
-    public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
-    {
-        Player player = ev.Player;
-        if (NeverEscape.Contains(player))
-            return;
-        if (PlayerEscaped.Contains(player))
-            return;
-        List<Pickup> droppedItems = [];
-        if (!CustomRoleHelpers.TryGetCustomRole(player, out var role))
-        {
-            if (ev.EscapeScenario == Escape.EscapeScenarioType.Custom)
-                ev.IsAllowed = false;
-            if (Main.Instance.Config.EscapeConfigs.Count == 0)
-                return;
-            var potentialEscapeRoles = Main.Instance.Config.EscapeConfigs.Where(x => x.Key.ShouldBeCuffer == player.IsDisarmed && x.Key.EscapeRole == player.Role).ToList();
-            if (potentialEscapeRoles.Count == 0)
-                return;
-            var roleTypeToEscapeTo = potentialEscapeRoles.Select(static x => x.Value).FirstOrDefault();
-            if (roleTypeToEscapeTo == PlayerRoles.RoleTypeId.None)
-                return;
-            foreach (var item in player.Items.ToList())
-            {
-                if (item is Scp1344Item scp1344Item)
-                    scp1344Item.Status = InventorySystem.Items.Usables.Scp1344.Scp1344Status.Idle;
-                var dropped = item.DropItem();
-                droppedItems.Add(dropped);
-            }
-            Timing.CallDelayed(2.5f, () =>
-            {
-                foreach (var item in droppedItems)
-                {
-                    item.Position = player.Position;
-                }
-            });
-            ev.IsAllowed = true;
-            ev.NewRole = roleTypeToEscapeTo;
-            ev.EscapeScenario = Escape.EscapeScenarioType.Custom;
-            PlayerEscaped.Add(player);
-            Timing.CallDelayed(1.5f, () => PlayerEscaped.Remove(player));
-            return;
-        }
-
-        if (!role.Escape.CanEscape)
-        {
-            ev.IsAllowed = false;
-            return;
-        }
-        var potentialCustomEscapeRoles = role.Escape.ConfigToRole.Where(x => x.Key.ShouldBeCuffer == player.IsDisarmed && x.Key.EscapeRole == player.Role).ToList();
-        if (potentialCustomEscapeRoles.Count == 0)
-            return;
-        var roleToEscapeTo = potentialCustomEscapeRoles.Select(static x => x.Value).FirstOrDefault();
-        if (roleToEscapeTo == default)
-            return;
-        bool RunOriginal = true;
-        Events.TriggerOnEscaping(player, role, ref RunOriginal);
-        if (!RunOriginal)
-            return;
-        ev.IsAllowed = false;
-        foreach (var item in player.Items.ToList())
-        {
-            if (item is Scp1344Item scp1344Item)
-                scp1344Item.Status = InventorySystem.Items.Usables.Scp1344.Scp1344Status.Idle;
-            var dropped = item.DropItem();
-            droppedItems.Add(dropped);
-        }
-        Timing.CallDelayed(2.5f, () =>
-        {
-            foreach (var item in droppedItems)
-            {
-                item.Position = player.Position;
-            }
-        });
-        var success = CustomRoleHelpers.SetNewRole(player, roleToEscapeTo, true);
-        PlayerEscaped.Add(player);
-        Timing.CallDelayed(1.5f, () => PlayerEscaped.Remove(player));
     }
 
     public override void OnServerWaveRespawned(WaveRespawnedEventArgs ev)

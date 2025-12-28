@@ -1,6 +1,8 @@
-﻿namespace SimpleCustomRoles.Handler;
+﻿using LabApi.Events.CustomHandlers;
 
-public class Scp079Handler
+namespace SimpleCustomRoles.Handler;
+
+public class Scp079Handler : CustomEventsHandler
 {
 
 }

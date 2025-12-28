@@ -43,7 +43,7 @@ public static class CustomRoleHelpers
 
     public static void SetFromCMD(Player player, CustomRoleBaseInfo customRoleInfo)
     {
-        UnSetCustomInfoToPlayer(player);
+        UnSetCustomInfoToPlayer(player, false);
         Timing.CallDelayed(0.1f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
     }
 
@@ -67,20 +67,37 @@ public static class CustomRoleHelpers
 
     public static bool UnSetCustomInfoToPlayer(Player player, bool resetRole = true, bool fromOptOut = false)
     {
+        return UnSetCustomInfoToPlayer(player, out _, resetRole, fromOptOut);
+    }
+
+    public static bool UnSetCustomInfoToPlayer(Player player, out string errorReason, bool resetRole = true, bool fromOptOut = false)
+    {
         if (player == null)
+        {
+            errorReason = "Player is null!";
             return false;
+        }
+            
         if (!Contains(player))
+        {
+            errorReason = "Role not found!";
             return false;
+        }
+
         var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
 
         bool shouldrun = true;
         Events.TriggerRoleRemoving(player, rolestorage.Role, fromOptOut, ref shouldrun);
         if (!shouldrun)
+        {
+            errorReason = "Removing denied!";
             return false;
+        }
 
         rolestorage.ResetRole = resetRole;
         Events.TriggerRoleRemoved(player, rolestorage.Role);
         rolestorage.Reset();
+        errorReason = string.Empty;
         return true;
     }
 
@@ -105,7 +122,7 @@ public static class CustomRoleHelpers
 
     public static bool Contains(Player player)
     {
-        return TryGetCustomRole(player, out var role) && role is not null;
+        return TryGetCustomRole(player, out _);
     }
 
     public static List<Player> GetPlayers()
