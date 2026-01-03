@@ -1,4 +1,5 @@
-﻿using InventorySystem;
+﻿using CustomPlayerEffects;
+using InventorySystem;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Modules;
 using LabApi.Features.Stores;
@@ -70,6 +71,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         SetFpc();
         SetCustomInfo();
         SetScpRoleInfos();
+        SpawnProt();
     }
 
     private void SpawnToPostion()
@@ -350,5 +352,13 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
                 Role.Scp.Scp939.CloudPlacedCooldown.MathCalculation(ref scp939AmnesticCloudAbility._placedCooldown);
             }
         }
+    }
+
+    private void SpawnProt()
+    {
+        if (!SpawnProtected.IsProtectionEnabled)
+            return;
+
+        Owner.EnableEffect<SpawnProtected>(1, SpawnProtected.SpawnDuration);
     }
 }
