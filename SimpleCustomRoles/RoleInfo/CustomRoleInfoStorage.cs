@@ -65,13 +65,15 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         yield return Timing.WaitForSeconds(0.1f);
         SetStats();
         yield return Timing.WaitForSeconds(0.2f);
+        yield return Timing.WaitForOneFrame;
+        SpawnProt();
         SetCommon();
         yield return Timing.WaitForOneFrame;
         yield return Timing.WaitForOneFrame;
         SetFpc();
         SetCustomInfo();
         SetScpRoleInfos();
-        SpawnProt();
+        yield return Timing.WaitForOneFrame;
     }
 
     private void SpawnToPostion()
@@ -236,12 +238,15 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 
     private void SetCommon()
     {
+        float time = 0.2f;
+        if (SpawnProtected.IsProtectionEnabled)
+            time += SpawnProtected.SpawnDuration;
         foreach (var effect in Role.Effects)
         {
             if (!effect.CanEnable)
                 continue;
-            // this time seems good I guess.
-            Timing.CallDelayed(0.2f, () => Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration));
+
+            Timing.CallDelayed(time, () => Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration));
         }
         Owner.IsBypassEnabled = Role.Extra.Bypass;
         if (Role.Extra.OpenDoorsNextToSpawn)
