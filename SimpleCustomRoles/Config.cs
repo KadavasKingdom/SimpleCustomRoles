@@ -7,6 +7,7 @@ namespace SimpleCustomRoles;
 public class Config
 {
     public bool Debug { get; set; }
+    public bool DebugEscape { get; set; } = true;
     public bool UseGlobalDir { get; set; }
     public bool IsPaused { get; set; }
     public ushort SpectatorBroadcastTime { get; set; } = 7;

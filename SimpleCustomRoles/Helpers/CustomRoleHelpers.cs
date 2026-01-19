@@ -26,18 +26,31 @@ public static class CustomRoleHelpers
     {
         if (newRoleInfo.RoleType != PlayerRoles.RoleTypeId.None)
         {
+            if (AsEscaped && Main.Instance.Config.DebugEscape)
+                CL.Debug($"[{player.PlayerId}] is escaping as {newRoleInfo.RoleType}!", Main.Instance.Config.DebugEscape);
+
             player.SetRole(newRoleInfo.RoleType, AsEscaped ? PlayerRoles.RoleChangeReason.Escaped : PlayerRoles.RoleChangeReason.None, newRoleInfo.Flags);
             return true;
         }
+
         CustomRoleBaseInfo customRoleInfo = null;
         if (!string.IsNullOrEmpty(newRoleInfo.Name))
             customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Name).FirstOrDefault();
+
         else if (newRoleInfo.Random.Count != 0)
             customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Random.RandomItem()).FirstOrDefault();
+
+        if (AsEscaped && Main.Instance.Config.DebugEscape)
+            CL.Debug($"[{player.PlayerId}] is escaping as {customRoleInfo.Rolename}!", Main.Instance.Config.DebugEscape);
+
         if (customRoleInfo == null)
+        {
+            CL.Warn($"SetNewRole trying to set role as null! Info: {newRoleInfo}");
             return false;
+        }
+
         UnSetCustomInfoToPlayer(player, false);
-        Timing.CallDelayed(0.1f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
+        Timing.CallDelayed(0.2f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
         return true;
     }
 

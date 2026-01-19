@@ -52,7 +52,7 @@ internal class Main : Plugin<Config>
         }
 
         StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
-        Harmony.DEBUG = Config.Debug;
+        //Harmony.DEBUG = Config.Debug;
         Harmony = new("SimpleCustomRole");
         Harmony.PatchAll();
     }

@@ -13,6 +13,12 @@ public class EscapeHandler : CustomEventsHandler
     public static HashSet<Player> PlayerEscaped = [];
     public static HashSet<Player> NeverEscape = [];
 
+    public override void OnPlayerChangedRole(PlayerChangedRoleEventArgs ev)
+    {
+        if (ev.Player != null)
+            NeverEscape.Remove(ev.Player);
+    }
+
     public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
     {
         Player player = ev.Player;
@@ -20,12 +26,14 @@ public class EscapeHandler : CustomEventsHandler
             return;
         if (PlayerEscaped.Contains(player))
             return;
+        
         if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var customRole))
         {
             EscapeAsNoRole(ev);
         }
         else
         {
+            CL.Debug($"Escaping {ev.Player.PlayerId}", Main.Instance.Config.DebugEscape);
             EscapeAsCustomRole(ev , customRole);
         }
     }
@@ -56,12 +64,22 @@ public class EscapeHandler : CustomEventsHandler
 
     public void EscapeAsNoRole(PlayerEscapingEventArgs ev)
     {
+        if (ev.EscapeScenario is not Escape.EscapeScenarioType.None or Escape.EscapeScenarioType.Custom)
+        {
+            return;
+        }
+
         // Selecting ideal escaping.
         if (Main.Instance.Config.EscapeConfigs.Count == 0)
+        {
+            NeverEscape.Add(ev.Player);
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK1");
+                CL.Debug("Config doesnt have config option!.");
+            }
             return;
-
-        if (ev.EscapeScenario is not Escape.EscapeScenarioType.None)
-            return;
+        }
 
         var potentialEscapeRoles = Main.Instance.Config.EscapeConfigs.Where(
             x => 
@@ -70,11 +88,25 @@ public class EscapeHandler : CustomEventsHandler
             .ToList();
 
         if (potentialEscapeRoles.Count == 0)
+        {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK3");
+                CL.Debug($"[{ev.Player.PlayerId}] Potential escape role is 0! {ev.Player.Role} {ev.Player.IsDisarmed}.");
+            }
             return;
+        }
 
         var roleTypeToEscapeTo = potentialEscapeRoles.Select(static x => x.Value).FirstOrDefault();
         if (roleTypeToEscapeTo == PlayerRoles.RoleTypeId.None)
+        {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK4");
+                CL.Debug($"[{ev.Player.PlayerId}] roleTypeToEscapeTo is None! {ev.Player.Role} {ev.Player.IsDisarmed} {roleTypeToEscapeTo}.", Main.Instance.Config.DebugEscape);
+            }
             return;
+        }
 
         // Hanlding escaping
         EscapeDrop(ev.Player);
@@ -85,15 +117,22 @@ public class EscapeHandler : CustomEventsHandler
         PlayerEscaped.Add(ev.Player);
         Timing.CallDelayed(1.5f, 
             () => PlayerEscaped.Remove(ev.Player));
+        ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} SUCCESS");
+        CL.Debug($"[{ev.Player.PlayerId}] is escaped as: {roleTypeToEscapeTo}.", Main.Instance.Config.DebugEscape);
     }
 
 
 
     public void EscapeAsCustomRole(PlayerEscapingEventArgs ev, CustomRoleBaseInfo customRole)
     {
-        
+        CL.Debug($"[{ev.Player.PlayerId}] Escaping as custom role {customRole.Rolename}.", Main.Instance.Config.DebugEscape);
         if (!customRole.Escape.CanEscape)
         {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK1");
+                CL.Debug($"[{ev.Player.PlayerId}] Escaping as custom role {customRole.Rolename} set to Cannot Escape!", Main.Instance.Config.DebugEscape);
+            }
             ev.IsAllowed = false;
             return;
         }
@@ -105,11 +144,25 @@ public class EscapeHandler : CustomEventsHandler
             .ToList();
 
         if (potentialCustomEscapeRoles.Count == 0)
+        {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK2");
+                CL.Debug($"[{ev.Player.PlayerId}] Potential escape role is 0! {ev.Player.Role} {ev.Player.IsDisarmed}.", Main.Instance.Config.DebugEscape);
+            }
             return;
+        }
 
         var roleToEscapeTo = potentialCustomEscapeRoles.Select(static x => x.Value).FirstOrDefault();
         if (roleToEscapeTo == default)
+        {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK3");
+                CL.Debug($"[{ev.Player.PlayerId}] roleTypeToEscapeTo is None! {ev.Player.Role} {ev.Player.IsDisarmed} {roleToEscapeTo}.", Main.Instance.Config.DebugEscape);
+            }
             return;
+        }
 
         ev.IsAllowed = false;
 
@@ -117,12 +170,21 @@ public class EscapeHandler : CustomEventsHandler
         Events.TriggerOnEscaping(ev.Player, customRole, ref RunOriginal);
         if (!RunOriginal)
         {
+            if (Main.Instance.Config.DebugEscape)
+            {
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENY3RDPARTY");
+                CL.Debug($"[{ev.Player.PlayerId}] Escaping has been denied by 3rd party! {RunOriginal}", Main.Instance.Config.DebugEscape);
+            }
             return;
         }
 
         EscapeDrop(ev.Player);
-
-        CustomRoleHelpers.SetNewRole(ev.Player, roleToEscapeTo, true);
+        if (Main.Instance.Config.DebugEscape)
+        {
+            CL.Debug($"[{ev.Player.PlayerId}] is escaping!", Main.Instance.Config.DebugEscape);
+            ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} SUCCESS");
+        }
+        CustomRoleHelpers.SetNewRole(ev.Player, roleToEscapeTo, true); 
         PlayerEscaped.Add(ev.Player);
         Timing.CallDelayed(1.5f, () => PlayerEscaped.Remove(ev.Player));
     }
