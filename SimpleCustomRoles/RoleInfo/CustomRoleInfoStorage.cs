@@ -239,7 +239,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
     private void SetCommon()
     {
         float time = 0.2f;
-        if (SpawnProtected.IsProtectionEnabled)
+        if (SpawnProtected.IsProtectionEnabled && SpawnProtected.ProtectedTeams.Contains(Owner.Team))
             time += SpawnProtected.SpawnDuration;
         foreach (var effect in Role.Effects)
         {
@@ -364,6 +364,13 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         if (!SpawnProtected.IsProtectionEnabled)
             return;
 
-        Owner.EnableEffect<SpawnProtected>(1, SpawnProtected.SpawnDuration);
+        if (!SpawnProtected.ProtectedTeams.Contains(Owner.Team))
+            return;
+
+        float duration = SpawnProtected.SpawnDuration;
+        if (SpawnProtected.SpawnDuration == 0)
+            duration = 8;
+
+        Owner.EnableEffect<SpawnProtected>(1, duration);
     }
 }
