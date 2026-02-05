@@ -22,8 +22,10 @@ public class EscapeHandler : CustomEventsHandler
     public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
     {
         Player player = ev.Player;
+
         if (NeverEscape.Contains(player))
             return;
+
         if (PlayerEscaped.Contains(player))
             return;
         
@@ -75,7 +77,7 @@ public class EscapeHandler : CustomEventsHandler
             NeverEscape.Add(ev.Player);
             if (Main.Instance.Config.DebugEscape)
             {
-                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK1");
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK1");
                 CL.Debug("Config doesnt have config option!.");
             }
             return;
@@ -91,8 +93,14 @@ public class EscapeHandler : CustomEventsHandler
         {
             if (Main.Instance.Config.DebugEscape)
             {
-                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK3");
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK3");
                 CL.Debug($"[{ev.Player.PlayerId}] Potential escape role is 0! {ev.Player.Role} {ev.Player.IsDisarmed}.");
+            }
+
+            if (!Main.Instance.Config.EscapeConfigs.Any(x => x.Key.EscapeRole == ev.Player.Role))
+            {
+                // Even if can escape we dont have a config for this role.
+                NeverEscape.Add(ev.Player);
             }
             return;
         }
@@ -102,7 +110,7 @@ public class EscapeHandler : CustomEventsHandler
         {
             if (Main.Instance.Config.DebugEscape)
             {
-                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK4");
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK4");
                 CL.Debug($"[{ev.Player.PlayerId}] roleTypeToEscapeTo is None! {ev.Player.Role} {ev.Player.IsDisarmed} {roleTypeToEscapeTo}.", Main.Instance.Config.DebugEscape);
             }
             return;
@@ -117,7 +125,7 @@ public class EscapeHandler : CustomEventsHandler
         PlayerEscaped.Add(ev.Player);
         Timing.CallDelayed(1.5f, 
             () => PlayerEscaped.Remove(ev.Player));
-        ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} SUCCESS");
+        ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} SUCCESS");
         CL.Debug($"[{ev.Player.PlayerId}] is escaped as: {roleTypeToEscapeTo}.", Main.Instance.Config.DebugEscape);
     }
 
@@ -130,7 +138,7 @@ public class EscapeHandler : CustomEventsHandler
         {
             if (Main.Instance.Config.DebugEscape)
             {
-                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK1");
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK1");
                 CL.Debug($"[{ev.Player.PlayerId}] Escaping as custom role {customRole.Rolename} set to Cannot Escape!", Main.Instance.Config.DebugEscape);
             }
             ev.IsAllowed = false;
@@ -147,8 +155,14 @@ public class EscapeHandler : CustomEventsHandler
         {
             if (Main.Instance.Config.DebugEscape)
             {
-                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK2");
+                ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK2");
                 CL.Debug($"[{ev.Player.PlayerId}] Potential escape role is 0! {ev.Player.Role} {ev.Player.IsDisarmed}.", Main.Instance.Config.DebugEscape);
+            }
+
+            if (!customRole.Escape.ConfigToRole.Any(x => x.Key.EscapeRole == ev.Player.Role))
+            {
+                // Even if can escape we dont have a config for this role.
+                NeverEscape.Add(ev.Player);
             }
             return;
         }
