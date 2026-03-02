@@ -75,8 +75,14 @@ internal class Main : Plugin<Config>
 
     public override void LoadConfigs()
     {
-        base.LoadConfigs();
-        var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml");
+        if (!this.TryLoadConfig(ConfigFileName, out Config config, true))
+        {
+            CL.Warn("Failed to load the configuration file, using default values.");
+            config = new();
+        }
+
+        Config = config;
+        var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml", config.UseGlobalDir);
         if (list != null)
             RoleGroups = list;
         else
