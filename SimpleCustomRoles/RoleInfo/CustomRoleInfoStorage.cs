@@ -45,7 +45,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         Owner.CustomInfo = OldCustomInfo;
         if (ResetRole)
         {
-            PlayerRoles.RoleTypeId prevRole = Owner.Role;
+            PlayerRoles.RoleTypeId prevRole = Role.ReplaceRole;
             Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
             Timing.CallDelayed(0.2f, () => Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All));
         }
