@@ -35,6 +35,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 
     public void Reset()
     {
+        var oldRole = Role;
         Role = null;
         Owner.IsBypassEnabled = false;
         ScaleHelper.SetScale(Owner, Vector3.one);
@@ -45,7 +46,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         Owner.CustomInfo = OldCustomInfo;
         if (ResetRole)
         {
-            PlayerRoles.RoleTypeId prevRole = Role.ReplaceRole;
+            PlayerRoles.RoleTypeId prevRole = oldRole.ReplaceRole;
             Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
             Timing.CallDelayed(0.2f, () => Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All));
         }
