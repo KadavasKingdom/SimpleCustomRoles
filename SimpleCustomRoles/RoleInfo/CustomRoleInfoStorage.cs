@@ -195,12 +195,13 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
             Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = newValue;
 
 #if ENABLEEFFECTHUD
-        EffectOnHUD.ShowEffects.AddHpModifier(Owner, "Custom Role", (int)(Owner.MaxHealth - originalMaxHealth));
+        if (Owner.MaxHealth - originalMaxHealth != 0)
+            EffectOnHUD.ShowEffects.AddHpModifier(Owner, "Custom Role", (int)(Owner.MaxHealth - originalMaxHealth));
 #endif
     }
 
     private void SetStats()
-    {
+    {   
         var newValue = Role.Stats.Health.MathCalculation(Owner.Health);
         if (newValue != Owner.Health)
             Owner.Health = newValue;
