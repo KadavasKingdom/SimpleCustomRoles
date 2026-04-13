@@ -10,7 +10,7 @@
 		<DebugType>pdbonly</DebugType>
 		<Optimize>true</Optimize>
 		<Copyright>SlejmUr</Copyright>
-		<Version>0.5.10</Version>
+		<Version>$([System.DateTime]::UtcNow.ToString("yyyy.MMdd.HHmm"))</Version>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
 	<ItemGroup>

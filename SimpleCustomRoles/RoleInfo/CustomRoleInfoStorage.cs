@@ -17,7 +17,6 @@ using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
 using UnityEngine;
-using UserSettings;
 
 namespace SimpleCustomRoles.RoleInfo;
 

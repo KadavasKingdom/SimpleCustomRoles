@@ -1,0 +1,7 @@
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+
+public static class AutoVersioning
+{
+	public static Version Version = new("<#= DateTime.UtcNow.ToString("yyyy.MMdd.HHmm") #>");
+}
