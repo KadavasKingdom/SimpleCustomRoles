@@ -6,10 +6,10 @@ on:
       - "release-*"
       - "latest"
     branches:
-      - **
+      - *
   pull_request:
     branches:
-      - **
+      - *
   workflow_dispatch:
     # allow manual trigger
 
