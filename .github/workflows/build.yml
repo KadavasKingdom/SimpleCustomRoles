@@ -2,58 +2,18 @@ name: Build
 
 on:
   push:
+    tags-ignore:
+      - "release-*"
+      - "latest"
   pull_request:
+    # PR
   workflow_dispatch:
-# allow manual trigger
-
-env:
-  REFERENCES_URL: https://exmod-team.github.io/SL-References/Dev.zip
-  REFERENCES_PATH: ${{ github.workspace }}/References
-  ProjName: SimpleCustomRoles
+    # allow manual trigger
 
 jobs:
   build:
-    runs-on: windows-latest
     permissions:
-      packages: read
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-
-    - name: Download References
-      shell: pwsh
-      run: |
-        Invoke-WebRequest -Uri ${{ env.REFERENCES_URL }} -OutFile "${{ github.workspace }}/References.zip"
-        Expand-Archive -Path "${{ github.workspace }}/References.zip" -DestinationPath ${{ env.REFERENCES_PATH }}
-#
-#    - name: Rename Assembly-CSharp-Publicized to Assembly-CSharp
-#      shell: pwsh
-#      run: |
-#          Rename-Item -Path "${{ env.REFERENCES_PATH }}\Assembly-CSharp-Publicized.dll" -NewName "Assembly-CSharp.dll"
-#          
-    - name: Build SimpleCustomRoles
-      env:
-        SL_REFERENCES: ${{ env.REFERENCES_PATH }}
-      run: dotnet build ${{ env.ProjName }}/${{ env.ProjName }}.csproj -o Out
-
-    - name : Upload SimpleCustomRoles
-      uses: actions/upload-artifact@v4.3.5
-      with:
-        name: ${{ env.ProjName }}
-        path: Out/*
-
-    - name: Build SimpleCustomRoles.EffectOnHud
-      env:
-        SL_REFERENCES: ${{ env.REFERENCES_PATH }}
-      run: dotnet build ${{ env.ProjName }}.EffectOnHud/${{ env.ProjName }}.EffectOnHud.csproj -o Out
-
-    - name : Upload SimpleCustomRoles.EffectOnHud
-      uses: actions/upload-artifact@v4.3.5
-      with:
-        name: ${{ env.ProjName }}.EffectOnHud
-        path: Out/*
+      contents: write
+    uses: KadavasKingdom/workflows/.github/workflows/build.yml@main
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
