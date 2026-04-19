@@ -5,8 +5,11 @@ on:
     tags-ignore:
       - "release-*"
       - "latest"
+    branches:
+      - **
   pull_request:
-    # PR
+    branches:
+      - **
   workflow_dispatch:
     # allow manual trigger
 
