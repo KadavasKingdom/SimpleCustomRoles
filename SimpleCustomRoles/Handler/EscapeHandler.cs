@@ -66,7 +66,7 @@ public class EscapeHandler : CustomEventsHandler
 
     public void EscapeAsNoRole(PlayerEscapingEventArgs ev)
     {
-        if (ev.EscapeScenario is not Escape.EscapeScenarioType.None or Escape.EscapeScenarioType.Custom)
+        if (ev.EscapeScenario is not (Escape.EscapeScenarioType.None or Escape.EscapeScenarioType.Custom))
         {
             return;
         }

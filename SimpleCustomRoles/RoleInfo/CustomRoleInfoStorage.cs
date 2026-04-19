@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace SimpleCustomRoles.RoleInfo;
 
-public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
+public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 {
     public CustomRoleBaseInfo Role;
     public string OldCustomInfo = string.Empty;
@@ -62,6 +62,7 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         yield return Timing.WaitForSeconds(0.2f);
         SetMaxStats();
         yield return Timing.WaitForSeconds(0.1f);
+        BeforeStat();
         SetStats();
         yield return Timing.WaitForSeconds(0.2f);
         yield return Timing.WaitForOneFrame;
@@ -170,12 +171,12 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         }
     }
 
-    private void SetMaxStats()
-    {
-#if ENABLEEFFECTHUD
-        float originalMaxHealth = Owner.MaxHealth;
+#if !ENABLEEFFECTHUD
+    private void BeforeStat() { }
 #endif
 
+    private void SetMaxStats()
+    {
         float newValue = Role.Stats.MaxHealth.MathCalculation(Owner.MaxHealth);
         if (newValue != Owner.MaxHealth)
             Owner.MaxHealth = newValue;
@@ -192,11 +193,6 @@ public class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
         newValue = Role.Stats.MaxStamina.MathCalculation(maxStat);
         if (newValue != maxStat)
             Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = newValue;
-
-#if ENABLEEFFECTHUD
-        if (Owner.MaxHealth - originalMaxHealth != 0)
-            EffectOnHUD.ShowEffects.AddHpModifier(Owner, "Custom Role", (int)(Owner.MaxHealth - originalMaxHealth));
-#endif
     }
 
     private void SetStats()

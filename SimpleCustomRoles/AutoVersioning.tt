@@ -3,5 +3,5 @@
 
 public static class AutoVersioning
 {
-	public static Version Version = new("<#= DateTime.UtcNow.ToString("yyyy.MMdd.HHmm") #>");
+	public static Version Version = new("<#= DateTime.UtcNow.ToString("yyyy.MMdd.HH") #>");
 }
