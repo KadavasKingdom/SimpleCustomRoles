@@ -9,7 +9,7 @@
 		<PlatformTarget>x64</PlatformTarget>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Copyright>SlejmUr</Copyright>
+		<Copyright>KadavasKingdom</Copyright>
 		<Version>$([System.DateTime]::UtcNow.ToString("yyyy.MMdd.HH"))</Version>
 		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
