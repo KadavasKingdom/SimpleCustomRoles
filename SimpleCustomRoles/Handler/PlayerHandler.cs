@@ -115,8 +115,10 @@ public class PlayerHandler : CustomEventsHandler
         CustomRoleHelpers.UnSetCustomInfoToPlayer(ev.Player, false);
         if (ev.Attacker == null)
             return;
+
         if (!CustomRoleHelpers.TryGetCustomRole(ev.Attacker, out var role))
             return;
+
         if (role.KillerToNewRole.Count == 0)
             return;
 
@@ -125,13 +127,16 @@ public class PlayerHandler : CustomEventsHandler
             x.Key.KillerRole == ev.Attacker.Role ||
             x.Key.KillerTeam == ev.Attacker.Team
         );
+
         if (!kv.Any())
             return;
+
         if (CustomRoleHelpers.SetNewRole(ev.Player, kv.FirstOrDefault().Value))
         {
             Timing.CallDelayed(0.8f, () =>
             {
-                ev.Player.Position = ev.Attacker.Position;
+                if (ev.Attacker.IsAlive)
+                    ev.Player.Position = ev.Attacker.Position;
             });
         }
     }
