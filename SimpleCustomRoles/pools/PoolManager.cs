@@ -45,7 +45,7 @@ namespace SimpleCustomRoles.Pools
             {
                 pool.SortByRarity();
 
-                pool.AddAdjustmentFunc(num => Mathf.Pow(num, Mathf.Log(Main.Instance.Config.SpawnRateMultiplier, 2)));
+                pool.AddAdjustmentFunc(num => Mathf.Pow(num, Mathf.Log(Main.Instance.Config.SpawnRateMultiplier * 2, 2)));
             }
         }
 
