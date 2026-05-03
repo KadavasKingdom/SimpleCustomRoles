@@ -62,7 +62,7 @@ internal class ServerHandler : CustomEventsHandler
             for (int i = 0; i < item.Spawn.SpawnAmount; i++)
             {
                 bool IsSpawning = false;
-                var random = RandomGenerator.GetInt16(1, 10000, true);
+                var random = URandom.Range(1, 10000);
                 if (!CustomRoleHelpers.IsShouldSpawn(item))
                 {
                     CL.Debug($"Role has been no longer spawn: {item.Rolename} (Reason: Player limited)", Main.Instance.Config.Debug);
@@ -104,6 +104,9 @@ internal class ServerHandler : CustomEventsHandler
         }
 
         List<Player> NotRoll = [];
+
+        RegularRoles.ShuffleListSecure();
+
         Timing.CallDelayed(0.2f, () =>
         {
             foreach (var item in RegularRoles)
