@@ -2,6 +2,7 @@
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.Pools;
 using SimpleCustomRoles.RoleInfo;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
@@ -37,10 +38,37 @@ internal class ServerHandler : CustomEventsHandler
         Main.Instance.ScpSpecificRoles = [];
         Main.Instance.EscapeRoles = [];
         RolesLoader.Load();
+        PoolManager.Reset();
         CL.Info("Loaded custom roles!");
     }
 
     public override void OnServerRoundStarted()
+    {
+        Timing.CallDelayed(0.2f, () =>
+        {
+            List<Player> players = [.. Player.ReadyList];
+            players.ShuffleListSecure();
+
+            foreach (var player in players)
+            {
+
+                if (!player.IsAlive)
+                    continue;
+
+                var role = player.GetRandomCustomRoleBaseInfo();
+
+                if (role != null)
+                {
+                    CustomRoleHelpers.SetCustomInfoToPlayer(player, role);
+                } else
+                {
+                    CL.Info($"{player.DisplayName} ({player.PlayerId}, {player.Role}) did not roll a custom role");
+                }
+            }
+        });
+    }
+
+    void _OnServerRoundStarted()
     {
         if (Main.Instance.Config.IsPaused)
             return;
