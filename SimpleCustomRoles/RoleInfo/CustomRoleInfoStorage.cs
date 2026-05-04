@@ -35,7 +35,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
     public void Reset()
     {
         Owner.IsBypassEnabled = false;
-        ScaleHelper.SetScale(Owner, Vector3.one);
+        ScaleExtension.SetScale(Owner, Vector3.one);
         Owner.Position += Vector3.up;
         Owner.Gravity = FpcGravityController.DefaultGravity;
         if (string.IsNullOrEmpty(OldCustomInfo))
@@ -262,12 +262,12 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 
         if (Role.Fpc.Scale != Vector3.one)
         {
-            ScaleHelper.SetScale(Owner, Role.Fpc.Scale);
+            ScaleExtension.SetScale(Owner, Role.Fpc.Scale);
         }
 
         if (Role.Fpc.FakeScale != Vector3.one)
         {
-            ScaleHelper.SetScale(Owner, Role.Fpc.FakeScale, true);
+            ScaleExtension.SetScale(Owner, Role.Fpc.FakeScale, true);
         }
 
         //  Appearance

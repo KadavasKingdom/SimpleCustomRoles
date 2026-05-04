@@ -20,7 +20,7 @@ public class PocketHandler : CustomEventsHandler
     public override void OnPlayerEnteredPocketDimension(PlayerEnteredPocketDimensionEventArgs ev)
     {
         PlayerToScale[ev.Player] = ev.Player.Scale;
-        ScaleHelper.SetScale(ev.Player, Vector3.one);
+        ScaleExtension.SetScale(ev.Player, Vector3.one);
     }
 
     public override void OnPlayerLeavingPocketDimension(PlayerLeavingPocketDimensionEventArgs ev)
@@ -38,7 +38,7 @@ public class PocketHandler : CustomEventsHandler
             return;
         if (PlayerToScale.TryGetValue(ev.Player, out Vector3 scale))
         {
-            ScaleHelper.SetScale(ev.Player, scale);
+            ScaleExtension.SetScale(ev.Player, scale);
             PlayerToScale.Remove(ev.Player);
         }
     }
