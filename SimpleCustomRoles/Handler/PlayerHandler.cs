@@ -155,7 +155,9 @@ public class PlayerHandler : CustomEventsHandler
         {
             if (item.Wave.SkipCheck || item.Wave.MinRequired > ev.Players.Count)
                 continue;
-            var list = ev.Players.Where(x => x.Role == item.ReplaceRole).ToList();
+            var list = ev.Players.Where(
+                x => x.Role == item.ReplaceRole && !CustomRoleHelpers.TryGetCustomRole(x, out _)
+            ).ToList();
             if (list.Count == 0)
                 continue;
             CustomRoleHelpers.SetCustomInfoToPlayer(list.RandomItem(), item);
