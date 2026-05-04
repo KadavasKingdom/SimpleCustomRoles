@@ -5,6 +5,7 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.Pools;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
 
@@ -141,7 +142,30 @@ public class PlayerHandler : CustomEventsHandler
         }
     }
 
+    
+
     public override void OnServerWaveRespawned(WaveRespawnedEventArgs ev)
+    {
+        PoolManager.Reset(true);
+        List<Player> players = [.. ev.Players];
+
+        players.ShuffleListSecure();
+
+        Predicate<CustomRoleBaseInfo> isValidForWavePred = x => !(x.Wave.SkipCheck || x.Wave.MinRequired > ev.Players.Count);
+
+        foreach (var player in players)
+        {
+            player.EnableEffect<FogControl>(2, 0.1f); // no idea why we're doing this but i fw it i guess
+            CustomRoleHelpers.UnSetCustomInfoToPlayer(player);
+
+            var role = PoolManager.GetRandomRoleGetterPredicate(player.Role, isValidForWavePred)();
+
+            if (role != null)
+                CustomRoleHelpers.SetCustomInfoToPlayer(player, role);
+        }
+    }
+
+    void _OnServerWaveRespawned(WaveRespawnedEventArgs ev)
     {
         if (ev.Players.Count == 0)
             return;
@@ -155,7 +179,7 @@ public class PlayerHandler : CustomEventsHandler
         {
             if (item.Wave.SkipCheck || item.Wave.MinRequired > ev.Players.Count)
                 continue;
-            var list = ev.Players.Where(x => x.Role == item.ReplaceRole).ToList();
+            var list = ev.Players.Where(x => x.Role == item.ReplaceRole && !CustomRoleHelpers.TryGetCustomRole(x, out _)).ToList();
             if (list.Count == 0)
                 continue;
             CustomRoleHelpers.SetCustomInfoToPlayer(list.RandomItem(), item);
