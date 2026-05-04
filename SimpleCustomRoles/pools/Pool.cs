@@ -1,7 +1,11 @@
-﻿using SimpleCustomRoles.RoleYaml;
+﻿using LabApi.Features.Wrappers;
+using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.RoleYaml;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,11 +17,11 @@ namespace SimpleCustomRoles.Pools
     {
         // Lower inclusive, upper exclusive
         internal List<(int Lower, int Upper, CustomRoleBaseInfo Role)> roles = [];
-        List<Func<float, float>> _adjustmentFuncs = new();
+        internal List<Func<float, float>> AdjustmentFuncs = new();
 
         internal void AddAdjustmentFunc(Func<float, float> adjustmentFunc)
         {
-            _adjustmentFuncs.Add(x =>
+            AdjustmentFuncs.Add(x =>
             {
                 float num = adjustmentFunc(x); 
                 if (num < 0 || num >= 1)
@@ -38,9 +42,12 @@ namespace SimpleCustomRoles.Pools
             }
         }
 
-        internal void AddRole(CustomRoleBaseInfo role)
+        internal void AddRole(CustomRoleBaseInfo role, bool useSpawnAmount = true)
         {
-            for (int i = 0; i < role.Spawn.SpawnAmount; i++)
+            if (role.Spawn.SpawnChance == 0)
+                return;
+            
+            for (int i = 0; i < (useSpawnAmount ? role.Spawn.SpawnAmount : 1); i++)
             {
                 int LowerBound = 0;
 
@@ -81,10 +88,14 @@ namespace SimpleCustomRoles.Pools
             if (randomNumber < 0 || randomNumber >= 1)
                 throw new ArgumentException("random number must be between 0 and 1");
 
-            foreach (var AdjustmentFunc in _adjustmentFuncs)
+            float unadjustedRandom = randomNumber;
+
+            CL.Info($"Original roll: {randomNumber}");
+            foreach (var AdjustmentFunc in AdjustmentFuncs)
             {
                 randomNumber = AdjustmentFunc(randomNumber);
             }
+            CL.Info($"Adjusted roll: {randomNumber}");
 
             if (randomNumber >= 1 - _ChanceToNotGetRole)
                 return null;
@@ -130,23 +141,69 @@ namespace SimpleCustomRoles.Pools
             //    }
             //}
 
-            var role = roles[middle].Role;
+            if (!ValidateRole(middle))
+            {
+                RemoveRole(middle);
+                return GetRandomRole(unadjustedRandom);
+            }
 
-            int middleChance = roles[middle].Upper - roles[middle].Lower;
 
-            for (int i = middle + 1; i < roles.Count; i++)
+            var role = RemoveRole(middle);
+
+            CL.Info($"Selected role {role.Display}");
+
+            return role;
+        }
+
+        internal bool ValidateRole(int RolePosition)
+        {
+            var role = roles[RolePosition].Role;
+
+            if (!CustomRoleHelpers.IsShouldSpawn(role))
+            {
+                CL.Debug($"Role has been no longer spawn: {role.Rolename} (Reason: Player limited)", Main.Instance.Config.Debug);
+                return false;
+            }
+            if (!GroupHelper.CanSpawn(role.Rolegroup, ref PoolManager.AlreadySpawnedRoles))
+            {
+                CL.Debug($"Role has been no longer spawn: {role.Rolename} (Reason: Group limited)", Main.Instance.Config.Debug);
+                return false;
+            }
+
+            return true;
+        }
+
+        internal CustomRoleBaseInfo? RemoveRole(CustomRoleBaseInfo Role)
+        {
+            for (int i = 0; i < roles.Count; i++)
+            {
+                if (roles[i].Role == Role)
+                {
+                    return RemoveRole(i);
+                }
+            }
+
+            return null;
+        }
+
+        internal CustomRoleBaseInfo RemoveRole(int RolePos)
+        {
+            var role = roles[RolePos];
+            int middleChance = role.Upper - role.Lower;
+            for (int i = RolePos + 1; i < roles.Count; i++)
             {
                 int newLower = roles[i].Lower - middleChance;
                 int newUpper = roles[i].Upper - middleChance;
 
-                roles[i] = (newLower, newUpper, roles[i].Role);
+                roles[i] = (newLower, newUpper, role.Role);
             }
-            roles.RemoveAt(middle);
+            roles.RemoveAt(RolePos);
 
-            _ChanceToNotGetRole /= 1 - role!.Spawn.SpawnChance / 10000f;
+            PoolManager.AlreadySpawnedRoles.Add(role.Role);
 
+            _ChanceToNotGetRole /= 1 - role.Role.Spawn.SpawnChance / 10000f;
 
-            return role;
+            return role.Role;
         }
 
         internal Pool() { }
