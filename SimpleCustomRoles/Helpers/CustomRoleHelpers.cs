@@ -40,14 +40,14 @@ public static class CustomRoleHelpers
         else if (newRoleInfo.Random.Count != 0)
             customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Random.RandomItem()).FirstOrDefault();
 
-        if (AsEscaped && Main.Instance.Config.DebugEscape)
-            CL.Debug($"[{player.PlayerId}] is escaping as {customRoleInfo.Rolename}!", Main.Instance.Config.DebugEscape);
-
         if (customRoleInfo == null)
         {
-            CL.Warn($"SetNewRole trying to set role as null! Info: {newRoleInfo}");
+            CL.Warn($"SetNewRole trying to set role as null! Info: {newRoleInfo} AsEscape: {AsEscaped}");
             return false;
         }
+
+        if (AsEscaped && Main.Instance.Config.DebugEscape)
+            CL.Debug($"[{player.PlayerId}] is escaping as {customRoleInfo.Rolename}!", Main.Instance.Config.DebugEscape);
 
         UnSetCustomInfoToPlayer(player, false);
         Timing.CallDelayed(0.2f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
