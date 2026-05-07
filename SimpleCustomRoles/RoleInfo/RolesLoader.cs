@@ -19,10 +19,20 @@ public static class RolesLoader
             {
                 if (file.Contains(".disable") || file.Contains(".d"))
                     continue;
+
                 if (!file.Contains(".yml"))
                     continue;
+
                 CL.Debug(file, Main.Instance.Config.Debug);
-                RoleInfos.Add(CustomYaml.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file)));
+
+                try
+                {
+                    RoleInfos.Add(CustomYaml.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file)));
+                }
+                catch (Exception ex)
+                {
+                    CL.Error($"Loading role errored on file {file}, error: {ex}");
+                }
             }
         }
         else
