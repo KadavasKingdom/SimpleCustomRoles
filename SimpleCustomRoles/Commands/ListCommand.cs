@@ -23,7 +23,7 @@ public class ListCommand : ICommand
         {
             response += $"\n{item.Rolename} [{item.Display.RARoleName}]";
         }
-        response += $"\nTotal Registered: {RolesLoader.RoleInfos.Count}";
+        response += $"\nLoaded: {RolesLoader.RoleInfos.Count}";
         return true;
     }
 }
