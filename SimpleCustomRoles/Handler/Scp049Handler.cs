@@ -3,6 +3,7 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.Pools;
 
 namespace SimpleCustomRoles.Handler;
 
@@ -18,6 +19,7 @@ public class Scp049Handler : CustomEventsHandler
     {
         if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
         {
+            // Why is this called CanRecall? This is for disabling zombie resurrection 
             if (!role.Scp.Scp049.CanRecall)
             {
                 ev.IsAllowed = false;
@@ -27,22 +29,13 @@ public class Scp049Handler : CustomEventsHandler
                 return;
         }
 
-        var list = Main.Instance.ScpSpecificRoles.Where(x => x.Scp.Scp0492.CanSpawnIfNoCustom094 == true).ToList();
-        CL.Debug($"Resurrecting count : {list.Count}", Main.Instance.Config.Debug);
-        if (list.Count > 0)
+        var newRole = PoolManager.ZombieReplacePool.GetRandomRole();
+        if (newRole is not null)
         {
-            role = list.RandomItem();
-            CL.Debug($"Resurrecting now having chance to res as: {role.Rolename}", Main.Instance.Config.Debug);
-            var random = RandomGenerator.GetInt16(1, 10000, true);
-            if (random <= role.Scp.Scp0492.ChanceForSpawn)
+            Timing.CallDelayed(0.2f, () =>
             {
-                CL.Debug($"Resurrecting: {role.Rolename}", Main.Instance.Config.Debug);
-                Timing.CallDelayed(0.2f, () =>
-                {
-                    CustomRoleHelpers.SetCustomInfoToPlayer(ev.Target, role);
-                });
-                Main.Instance.ScpSpecificRoles.Remove(role);
-            }
+                CustomRoleHelpers.SetCustomInfoToPlayer(ev.Target, newRole);
+            });
         }
     }
 

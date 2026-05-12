@@ -5,8 +5,8 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.Pools;
 using SimpleCustomRoles.RoleYaml;
-using SimpleCustomRoles.RoleYaml.Enums;
 
 namespace SimpleCustomRoles.Handler;
 
@@ -141,33 +141,26 @@ public class PlayerHandler : CustomEventsHandler
         }
     }
 
+    
+
     public override void OnServerWaveRespawned(WaveRespawnedEventArgs ev)
     {
-        if (ev.Players.Count == 0)
-            return;
-        List<CustomRoleBaseInfo> tmp = [];
-        foreach (var item in ev.Players)
-        {
-            item.EnableEffect<FogControl>(2, 0.1f);
-            CustomRoleHelpers.UnSetCustomInfoToPlayer(item);
-        }
-        foreach (var item in Main.Instance.InWaveRoles.Where(x => x.Wave.Faction == ev.Wave.Faction && x.RoleType == CustomRoleType.InWave))
-        {
-            if (item.Wave.SkipCheck || item.Wave.MinRequired > ev.Players.Count)
-                continue;
-            var list = ev.Players.Where(
-                x => x.Role == item.ReplaceRole && !CustomRoleHelpers.TryGetCustomRole(x, out _)
-            ).ToList();
-            if (list.Count == 0)
-                continue;
-            CustomRoleHelpers.SetCustomInfoToPlayer(list.RandomItem(), item);
-            if (item.Wave.RemoveAfterSpawn)
-                tmp.Add(item);
-        }
+        PoolManager.Reset(true);
+        List<Player> players = [.. ev.Players];
 
-        foreach (var item in tmp)
+        players.ShuffleListSecure();
+
+        Predicate<CustomRoleBaseInfo> isValidForWavePred = x => !(x.Wave.SkipCheck || x.Wave.MinRequired > ev.Players.Count);
+
+        foreach (var player in players)
         {
-            Main.Instance.InWaveRoles.Remove(item);
+            player.EnableEffect<FogControl>(2, 0.1f);
+            CustomRoleHelpers.UnSetCustomInfoToPlayer(player);
+
+            var role = PoolManager.GetRandomRoleGetterPredicate(player.Role, isValidForWavePred)();
+
+            if (role != null)
+                CustomRoleHelpers.SetCustomInfoToPlayer(player, role);
         }
     }
 }

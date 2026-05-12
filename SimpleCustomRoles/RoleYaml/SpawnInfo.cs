@@ -4,7 +4,7 @@ namespace SimpleCustomRoles.RoleYaml;
 
 public class SpawnInfo
 {
-    [Description("Role spawning chance. 0 means NEVER, min 1, max 10000 [10 000] (so 0.01 = 1, 60 = 6000 [6 000])")]
+    [Description("Role spawning weight. 0 = will never spawn. By default, ")]
     public int SpawnChance { get; set; } = 0;
 
     [Description("Role spawn ammount")]

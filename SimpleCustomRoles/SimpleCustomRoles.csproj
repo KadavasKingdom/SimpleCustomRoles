@@ -51,6 +51,7 @@
 	<Import Project="ReferencePaths.props.user" Condition="Exists('ReferencePaths.props.user')" />
 	<PropertyGroup>
 		<AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);../3rdparty</AssemblySearchPaths>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<!-- GIT Version -->
