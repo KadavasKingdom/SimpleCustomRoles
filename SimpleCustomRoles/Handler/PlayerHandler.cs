@@ -149,7 +149,8 @@ public class PlayerHandler : CustomEventsHandler
         List<Player> players = [.. ev.Players];
 
         players.ShuffleListSecure();
-
+        
+        // Roles that are invalid for this wave will be removed from the pool
         Predicate<CustomRoleBaseInfo> isValidForWavePred = x => !(x.Wave.SkipCheck || x.Wave.MinRequired > ev.Players.Count);
 
         foreach (var player in players)
@@ -157,6 +158,7 @@ public class PlayerHandler : CustomEventsHandler
             player.EnableEffect<FogControl>(2, 0.1f);
             CustomRoleHelpers.UnSetCustomInfoToPlayer(player);
 
+            // Get a random role, using the predicate above
             var role = PoolManager.GetRandomRoleGetterPredicate(player.Role, isValidForWavePred)();
 
             if (role != null)

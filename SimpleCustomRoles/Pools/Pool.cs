@@ -5,33 +5,56 @@ using Utils.NonAllocLINQ;
 
 namespace SimpleCustomRoles.Pools
 {
+    /*
+        Pool comprised of custom roles (or null values) along with weights. Every role has a lower bound and an upper bound,
+        and the difference between those two is its weight. When a custom role is randomized for, a random number is picked
+        and finds the role where the random number is between the lower bound and upper bound. That role is returned, and
+        removed from the pool.
+    Example:
+        Pool is comprised of: [(0, 100, NtfQRF), (100, 500, GuardSecretary), (500, 900, GuardSecretary), (900, 2900, null)]
+        Pool is asked for a random role. It generates 0.12 from RNG, multiplies it by 2900, gets 345.
+        Since 345 is between 100 and 500, Secretary is picked. It is removed from the pool. All custom roles are compacted to the left.
+        Pool is now: [(0, 100, NtfQRF), (100, 500, GuardSecretary), (500, 2500, null)]
+        Again rng rolls 0.95, which is 2375. That role is null, so null (no custom role) is returned, but the null value is not removed from the pool. 
+    */
     public class Pool
     {
+        // Role type for this pool. Can be None if the pool uses multiple role types.
+        // (mainly used to determine the weight of no custom role spawning)
         RoleTypeId _RoleType;
-        // Lower inclusive, upper exclusive
+
+        // Lower inclusive, upper exclusive. invariants: always ordered and contiguous,
+        // Upper > Lower, Lower >= 0, Upper > 0. When used to get a random role, must not be empty
         internal List<(int Lower, int Upper, CustomRoleBaseInfo? Role)> roles = [];
+        // Applies "adjustments" on the rng value rolled. Ex: rng returns 0.786,
+        // adjustment funcs modify that to 0.675, and that is the number used for calculation.
         internal List<Func<float, float>> AdjustmentFuncs = new();
+        // Creates a new pool, adds each new role into it, multiplying its spawn chance by what transformFunc returns for that role.
         internal Pool Transform(Func<CustomRoleBaseInfo?, float> transformFunc)
         {
             var pool = new Pool();
 
             pool.AdjustmentFuncs = AdjustmentFuncs;
 
-            foreach (var entry in roles.Where(x => x.Role != null))
+            foreach (var entry in roles)
             {
+                if (entry.Role == null)
+                {
+                    pool.AddRole(entry.Role);
+                    continue;
+                }
+
                 float multiplier = transformFunc(entry.Role);
 
-                multiplier *= (entry.Upper - entry.Lower) / entry.Role!.Spawn.SpawnChance;
+                // usually will multiply by 1, but must check anyways
+                multiplier *= (entry.Upper - entry.Lower) / GetSpawnChance(entry.Role);
 
-                if (multiplier == 0f)
+                if (multiplier <= 0f)
                     continue;
 
-                int LowerBound = 0;
 
-                if (!pool.roles.IsEmpty())
-                    LowerBound = pool.roles.Last().Upper;
 
-                int NewChance = (int)(entry.Role.Spawn.SpawnChance * multiplier);
+                int NewChance = (int)(GetSpawnChance(entry.Role) * multiplier);
 
 
                 pool.AddRole(entry.Role, NewChance, 1);
@@ -40,7 +63,7 @@ namespace SimpleCustomRoles.Pools
             return pool;
         }
 
-
+        // transform using multiple transform funcs
         internal Pool Transform(IEnumerable<Func<CustomRoleBaseInfo?, float>> transformFuncs) =>
             Transform(x =>
             {
@@ -50,6 +73,7 @@ namespace SimpleCustomRoles.Pools
                 return ret;
             });
 
+        // transform, but modify the original pool instead of making a new one
         internal void TransformInPlace(Func<CustomRoleBaseInfo?, float> transformFunc)
         {
             var new_pool = Transform(transformFunc);
@@ -66,6 +90,7 @@ namespace SimpleCustomRoles.Pools
 
         public void AddAdjustmentFunc(Func<float, float> adjustmentFunc)
         {
+            // add adjustment func with a wrapper to make sure rng value stays valid
             AdjustmentFuncs.Add(x =>
             {
                 float num = adjustmentFunc(x);
@@ -76,6 +101,7 @@ namespace SimpleCustomRoles.Pools
             });
         }
 
+        // Gets SpawnAmount for a role, multiplied by all configs
         int GetSpawnAmount(CustomRoleBaseInfo? role)
         {
             if (role == null)
@@ -93,8 +119,10 @@ namespace SimpleCustomRoles.Pools
             return SpawnAmount;
         }
 
+        // Gets SpawnChance for a role, multiplied by all configs
         int GetSpawnChance(CustomRoleBaseInfo? role)
         {
+            // Config for weight of no custom role.
             if (role == null)
             {
                 if (!Main.Instance.Config.NoCustomRoleChance.TryGetValue(_RoleType, out var CfgChance))
@@ -119,6 +147,7 @@ namespace SimpleCustomRoles.Pools
             return Chance;
         }
 
+        // Main entry point to add roles to the pool. useSpawnAmount might be false if you're copying in roles from another pool
         public void AddRole(CustomRoleBaseInfo? role, bool useSpawnAmount = true)
         {
             int SpawnAmount = useSpawnAmount ? GetSpawnAmount(role) : 1;
@@ -127,8 +156,10 @@ namespace SimpleCustomRoles.Pools
             AddRole(role, Chance, SpawnAmount);
         }
 
+        // Add role with preset weight and amount, all logic is here
         public void AddRole(CustomRoleBaseInfo? role, int weight, int amount)
         {
+            // If pool has a dedicated role type, don't allow other role types to be inserted
             if (_RoleType != RoleTypeId.None && role != null && role.ReplaceRole != _RoleType)
             {
                 CL.Error($"Role replacing {role!.ReplaceRole} attempted to be added to a pool typed to replace {_RoleType}. Not inserting into pool.");
@@ -144,6 +175,7 @@ namespace SimpleCustomRoles.Pools
             {
                 int LowerBound = 0;
 
+                // Get lower bound from the last item in roles
                 if (!roles.IsEmpty())
                     LowerBound = roles.Last().Upper;
 
@@ -154,15 +186,19 @@ namespace SimpleCustomRoles.Pools
             }
         }
 
+        // Put rare roles further left, and more common roles further right
         internal void SortByRarity()
         {
             int Cursor = 0;
-            var ListByChance = roles.Select(x => (x.Upper - x.Lower, x.Role)).OrderBy(x => x.Role == null ? int.MaxValue : x.Item1).ToList();
+            // Order by weight (but put the null values at the end)
+            var ListByChance = roles.OrderBy(x => x.Role == null ? int.MaxValue : x.Upper - x.Lower).ToList();
 
             List<(int Lower, int Upper, CustomRoleBaseInfo? Role)> NewRoles = new();
 
-            foreach ((int Size, CustomRoleBaseInfo? Role) in ListByChance)
+            // Have to do this to maintain invariants in the roles
+            foreach ((int Lower, int Upper, CustomRoleBaseInfo? Role) in ListByChance)
             {
+                int Size = Upper - Lower;
                 NewRoles.Add((Cursor, Cursor + Size, Role));
                 Cursor += Size;
             }
@@ -172,6 +208,7 @@ namespace SimpleCustomRoles.Pools
 
         public CustomRoleBaseInfo? GetRandomRole()
         {
+            // random float in [0-1)
             float randomNumber = RandomGenerator.GetUInt32(true) / 4294967296f;
 
             return GetRandomRole(randomNumber);
@@ -191,10 +228,10 @@ namespace SimpleCustomRoles.Pools
 
             if (roles.Count == 0)
             {
-                CL.Error("roles count was zero");
                 return null;
             }
 
+            // Convert random number to a weight in the pool
             int adjustedNumber = (int)(randomNumber * roles.Last().Upper);
 
             int rolePos = -1;
@@ -210,11 +247,11 @@ namespace SimpleCustomRoles.Pools
 
             if (rolePos == -1)
             {
-                CL.Debug($"got -1 rolepos. {adjustedNumber}");
+                CL.Error($"got -1 rolepos. {adjustedNumber}");
                 return null;
             }
 
-
+            // If role is invalid (e.g. blocked by group) get a different role and remove the invalid role from pool.
             if (!ValidateRole(rolePos))
             {
                 RemoveRole(rolePos);
@@ -228,6 +265,7 @@ namespace SimpleCustomRoles.Pools
             return role;
         }
 
+        // Checks whether the role at roles[RolePosition] is valid to be selected
         internal bool ValidateRole(int RolePosition)
         {
             var role = roles[RolePosition].Role;
@@ -267,11 +305,14 @@ namespace SimpleCustomRoles.Pools
 
         internal CustomRoleBaseInfo? RemoveRole(int RolePos)
         {
+            // Get role (it's about to be removed from the list)
             var role = roles[RolePos];
 
             if (role.Role == null)
                 return null;
+            // Get weight for selected role
             int middleChance = role.Upper - role.Lower;
+            // Subtract weight from Lower and Upper for all roles to the right of selected role
             for (int i = RolePos + 1; i < roles.Count; i++)
             {
                 int newLower = roles[i].Lower - middleChance;
