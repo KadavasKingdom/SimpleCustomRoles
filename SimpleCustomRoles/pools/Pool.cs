@@ -124,12 +124,12 @@ namespace SimpleCustomRoles.Pools
             int SpawnAmount = useSpawnAmount ? GetSpawnAmount(role) : 1;
             int Chance = GetSpawnChance(role);
 
-            AddRole(role, SpawnAmount, Chance);
+            AddRole(role, Chance, SpawnAmount);
         }
 
         public void AddRole(CustomRoleBaseInfo? role, int weight, int amount)
         {
-            if (_RoleType != RoleTypeId.None && role?.ReplaceRole != _RoleType)
+            if (_RoleType != RoleTypeId.None && role != null && role.ReplaceRole != _RoleType)
             {
                 CL.Error($"Role replacing {role!.ReplaceRole} attempted to be added to a pool typed to replace {_RoleType}. Not inserting into pool.");
                 return;
