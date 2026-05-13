@@ -50,7 +50,8 @@ internal class ServerHandler : CustomEventsHandler
                 if (role != null)
                 {
                     CustomRoleHelpers.SetCustomInfoToPlayer(player, role);
-                } else
+                } 
+                else
                 {
                     CL.Debug($"{player.DisplayName} ({player.PlayerId}, {player.Role}) did not roll a custom role", Main.Instance.Config.Debug);
                 }
