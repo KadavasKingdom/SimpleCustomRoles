@@ -47,6 +47,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
             Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
             Timing.CallDelayed(0.2f, () =>
             {
+                // In rare cases, they will be set to another role in this 0.2 seconds (primarily by .fill from ZombieOptOut)
                 if (Owner.Role == PlayerRoles.RoleTypeId.Spectator)
                     Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All);
             });

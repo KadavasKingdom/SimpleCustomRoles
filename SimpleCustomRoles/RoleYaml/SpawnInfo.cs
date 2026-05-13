@@ -4,7 +4,7 @@ namespace SimpleCustomRoles.RoleYaml;
 
 public class SpawnInfo
 {
-    [Description("Role spawning weight. 0 = will never spawn. By default, ")]
+    [Description("Role spawning weight. 0 = will never spawn.")]
     public int SpawnChance { get; set; } = 0;
 
     [Description("Role spawn ammount")]
