@@ -209,7 +209,7 @@ namespace SimpleCustomRoles.Pools
         public CustomRoleBaseInfo? GetRandomRole()
         {
             // random float in [0-1)
-            float randomNumber = RandomGenerator.GetUInt32(true) / 4294967296f;
+            float randomNumber = URandom.value;
 
             return GetRandomRole(randomNumber);
         }
