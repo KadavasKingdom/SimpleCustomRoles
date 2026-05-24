@@ -16,10 +16,10 @@ public class PlayerHandler : CustomEventsHandler
     {
         if (ev.Player == null)
             return;
-        EscapeHandler.PlayerEscaped.Remove(ev.Player);
+        bool changedRoleFromEscape = EscapeHandler.PlayerEscaped.Remove(ev.Player);
         if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.Destroyed)
             ev.Player.ClearBroadcasts();
-        if (ev.ChangeReason is not PlayerRoles.RoleChangeReason.None)
+        if (!changedRoleFromEscape && ev.ChangeReason is not PlayerRoles.RoleChangeReason.None)
             CustomRoleHelpers.UnSetCustomInfoToPlayer(ev.Player, false);
     }
 
