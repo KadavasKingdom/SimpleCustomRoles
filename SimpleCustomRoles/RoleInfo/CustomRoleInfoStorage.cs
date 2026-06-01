@@ -45,7 +45,12 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
         {
             PlayerRoles.RoleTypeId prevRole = Role.ReplaceRole;
             Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
-            Timing.CallDelayed(0.2f, () => Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All));
+            Timing.CallDelayed(0.2f, () =>
+            {
+                // In rare cases, they will be set to another role in this 0.2 seconds (primarily by .fill from ZombieOptOut)
+                if (Owner.Role == PlayerRoles.RoleTypeId.Spectator)
+                    Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All);
+            });
         }
         Role = null;
     }
@@ -196,7 +201,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
     }
 
     private void SetStats()
-    {   
+    {
         var newValue = Role.Stats.Health.MathCalculation(Owner.Health);
         if (newValue != Owner.Health)
             Owner.Health = newValue;

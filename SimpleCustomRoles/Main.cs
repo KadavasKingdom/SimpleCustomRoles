@@ -7,7 +7,6 @@ using LabApi.Loader.Features.Plugins;
 using SimpleCustomRoles.Handler;
 using SimpleCustomRoles.RoleGroup;
 using SimpleCustomRoles.RoleInfo;
-using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.SSS;
 
 namespace SimpleCustomRoles;
@@ -24,9 +23,6 @@ internal class Main : Plugin<Config>
     public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
     #endregion
 
-    public List<CustomRoleBaseInfo> InWaveRoles = [];
-    public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
-    public List<CustomRoleBaseInfo> EscapeRoles = [];
 
     private readonly List<CustomEventsHandler> handlers = 
     [

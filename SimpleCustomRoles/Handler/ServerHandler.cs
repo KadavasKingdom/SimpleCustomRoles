@@ -2,9 +2,8 @@
 using LabApi.Features.Wrappers;
 using MEC;
 using SimpleCustomRoles.Helpers;
+using SimpleCustomRoles.Pools;
 using SimpleCustomRoles.RoleInfo;
-using SimpleCustomRoles.RoleYaml;
-using SimpleCustomRoles.RoleYaml.Enums;
 
 namespace SimpleCustomRoles.Handler;
 
@@ -12,39 +11,19 @@ internal class ServerHandler : CustomEventsHandler
 {
     public static void ReloadRoles()
     {
-        Main.Instance.InWaveRoles = [];
-        Main.Instance.ScpSpecificRoles = [];
         RolesLoader.Load();
-        foreach (var item in RolesLoader.RoleInfos)
-        {
-            if (item.RoleType == CustomRoleType.AfterDead)
-            {
-                continue;
-            }
-            for (int i = 0; i < item.Spawn.SpawnAmount; i++)
-            {
-                if (item.RoleType == CustomRoleType.ScpSpecific)
-                    Main.Instance.ScpSpecificRoles.Add(item);
-                if (item.RoleType == CustomRoleType.InWave)
-                    Main.Instance.InWaveRoles.Add(item);
-            }
-        }
+        PoolManager.Reset();
     }
 
     public override void OnServerWaitingForPlayers()
     {
-        Main.Instance.InWaveRoles = [];
-        Main.Instance.ScpSpecificRoles = [];
-        Main.Instance.EscapeRoles = [];
         RolesLoader.Load();
+        PoolManager.Reset();
         CL.Info("Loaded custom roles!");
     }
 
     public override void OnServerRoundStarted()
     {
-        if (Main.Instance.Config.IsPaused)
-            return;
-
         // Round lock for certain roles.
         if (!Round.IsLocked)
         {
@@ -54,86 +33,29 @@ internal class ServerHandler : CustomEventsHandler
                 Round.IsLocked = false;
             });
         }
-        List<CustomRoleBaseInfo> RegularRoles = [];
-        foreach (var item in RolesLoader.RoleInfos)
-        {
-            if (item.RoleType == CustomRoleType.AfterDead)
-                continue;
-            for (int i = 0; i < item.Spawn.SpawnAmount; i++)
-            {
-                bool IsSpawning = false;
-                var random = URandom.Range(1, 10000);
-                if (!CustomRoleHelpers.IsShouldSpawn(item))
-                {
-                    CL.Debug($"Role has been no longer spawn: {item.Rolename} (Reason: Player limited)", Main.Instance.Config.Debug);
-                    continue;
-                }
-                if (!GroupHelper.CanSpawn(item.Rolegroup, ref RegularRoles))
-                {
-                    CL.Debug($"Role has been no longer spawn: {item.Rolename} (Reason: Group limited)", Main.Instance.Config.Debug);
-                    break;
-                }
-                GroupHelper.DenyCustomRoles(item.Rolegroup, ref RegularRoles);
-                int chance = item.Spawn.SpawnChance;
-                if (Main.Instance.Config.UsePlayerPercent && !item.Spawn.DenyChance)
-                {
-                    CL.Debug($"Basic chance: {chance}", Main.Instance.Config.Debug);
-                    float chance_mulitplier = ((float)Server.PlayerCount / (float)Server.MaxPlayers);
-                    chance = (int)(chance * chance_mulitplier);
-                    CL.Debug($"Final chance: {chance}", Main.Instance.Config.Debug);
-                }
-                if (!item.Spawn.DenyChance)
-                    chance = (int)((float)chance * Main.Instance.Config.SpawnRateMultiplier);
-                if (random <= chance)
-                {
-                    IsSpawning = true;
-                    if (item.RoleType == CustomRoleType.ScpSpecific)
-                        Main.Instance.ScpSpecificRoles.Add(item);
-                    if (item.RoleType == CustomRoleType.InWave)
-                        Main.Instance.InWaveRoles.Add(item);
-                    else
-                        RegularRoles.Add(item);
-                }
-                CL.Debug($"Rolled chance: {random}/{chance} for Role {item.Rolename}. Role is " + (IsSpawning ? "" : "NOT ") + "spawning.", Main.Instance.Config.Debug);
-            }
-        }
-
-        foreach (var item in RegularRoles.Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
-        {
-            GroupHelper.DenyCustomRoles(item.Rolegroup, ref RegularRoles);
-        }
-
-        List<Player> NotRoll = [];
-
-        RegularRoles.ShuffleListSecure();
 
         Timing.CallDelayed(0.2f, () =>
         {
-            foreach (var item in RegularRoles)
-            {
-                Player player = null;
+            List<Player> players = [.. Player.ReadyList];
+            players.ShuffleListSecure();
 
-                if (item.ReplaceRole == PlayerRoles.RoleTypeId.None && item.ReplaceTeam != PlayerRoles.Team.Dead)
-                {
-                    var list = Player.ReadyList.Where(x => x.Team == item.ReplaceTeam && !CustomRoleHelpers.Contains(x) && !NotRoll.Contains(x)).ToList();
-                    if (list.Count > 0)
-                        player = list.RandomItem();
-                }
-                else
-                {
-                    var list = Player.ReadyList.Where(x => x.Role == item.ReplaceRole && !CustomRoleHelpers.Contains(x) && !NotRoll.Contains(x)).ToList();
-                    if (list.Count > 0)
-                        player = list.RandomItem();
-                }
-                if (player == null)
+            foreach (var player in players)
+            {
+
+                if (!player.IsAlive)
                     continue;
 
-                if (Main.Instance.Config.ShowSpawnMessage)
-                    CL.Info($"Player Selected to spawn: {player.UserId} as {item.Rolename}");
-                NotRoll.Add(player);
-                CustomRoleHelpers.SetCustomInfoToPlayer(player, item);
+                var role = player.GetRandomCustomRoleBaseInfo();
+
+                if (role != null)
+                {
+                    CustomRoleHelpers.SetCustomInfoToPlayer(player, role);
+                } 
+                else
+                {
+                    CL.Debug($"{player.DisplayName} ({player.PlayerId}, {player.Role}) did not roll a custom role", Main.Instance.Config.Debug);
+                }
             }
-            RegularRoles.Clear();
         });
     }
 }
