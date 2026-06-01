@@ -32,7 +32,7 @@ internal class Main : Plugin<Config>
     [
         new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
         new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
-        new Scp173Handler(), new Scp330Handler(), new ObjectHandler(),
+        new Scp173Handler(), new Scp330Handler(), new Scp939Handler(), new ObjectHandler(),
     ];
 
     public List<RoleBaseGroup> RoleGroups = [];
