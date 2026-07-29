@@ -27,6 +27,7 @@ internal class Main : Plugin<Config>
     public List<CustomRoleBaseInfo> InWaveRoles = [];
     public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
     public List<CustomRoleBaseInfo> EscapeRoles = [];
+    public List<CustomRoleBaseInfo> RiggedRoles = [];
 
     private readonly List<CustomEventsHandler> handlers = 
     [

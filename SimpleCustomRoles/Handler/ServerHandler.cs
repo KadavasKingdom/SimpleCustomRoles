@@ -1,10 +1,13 @@
 ﻿using LabApi.Events.CustomHandlers;
+using LabApi.Features.Extensions;
 using LabApi.Features.Wrappers;
 using MEC;
+using PlayerRoles;
 using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleInfo;
 using SimpleCustomRoles.RoleYaml;
 using SimpleCustomRoles.RoleYaml.Enums;
+using System.Linq;
 
 namespace SimpleCustomRoles.Handler;
 
@@ -36,6 +39,7 @@ internal class ServerHandler : CustomEventsHandler
         Main.Instance.InWaveRoles = [];
         Main.Instance.ScpSpecificRoles = [];
         Main.Instance.EscapeRoles = [];
+        Main.Instance.RiggedRoles = [];
         RolesLoader.Load();
         CL.Info("Loaded custom roles!");
     }
@@ -97,19 +101,19 @@ internal class ServerHandler : CustomEventsHandler
                 CL.Debug($"Rolled chance: {random}/{chance} for Role {item.Rolename}. Role is " + (IsSpawning ? "" : "NOT ") + "spawning.", Main.Instance.Config.Debug);
             }
         }
+        RegularRoles.ShuffleListSecure();
+
 
         foreach (var item in RegularRoles.Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
         {
             GroupHelper.DenyCustomRoles(item.Rolegroup, ref RegularRoles);
         }
-
+        var riggedAndRegularRoles = Main.Instance.RiggedRoles.Concat(RegularRoles).ToList();
         List<Player> NotRoll = [];
-
-        RegularRoles.ShuffleListSecure();
-
+        List<CustomRoleBaseInfo> Rolled = new();
         Timing.CallDelayed(0.2f, () =>
         {
-            foreach (var item in RegularRoles)
+            foreach (var item in riggedAndRegularRoles)
             {
                 Player player = null;
 
@@ -130,10 +134,37 @@ internal class ServerHandler : CustomEventsHandler
 
                 if (Main.Instance.Config.ShowSpawnMessage)
                     CL.Info($"Player Selected to spawn: {player.UserId} as {item.Rolename}");
+                Rolled.Add(item);
                 NotRoll.Add(player);
                 CustomRoleHelpers.SetCustomInfoToPlayer(player, item);
             }
+            riggedAndRegularRoles.Clear();
             RegularRoles.Clear();
+
+            foreach (var role in Main.Instance.RiggedRoles.Where(x => !Rolled.Contains(x)))
+            {
+                // in case for some reason the other player just didn't get selected
+                // if the role replaces an 096 or 079 it's best to get the respective other one (so you dont have overlord on the same team as 096 for example)
+                var otherRole = role.ReplaceRole switch
+                {
+                    RoleTypeId.Scp079 => RoleTypeId.Scp096,
+                    RoleTypeId.Scp096 => RoleTypeId.Scp079,
+                    _ => RoleTypeId.None,
+                };
+                var plr = Player.ReadyList.Where(x => x.Role == otherRole).FirstOrDefault();
+                // if role replaces a scp, get random scp, otherwise get random human
+                plr ??= Player.ReadyList.Where(x => !(role.ReplaceRole.IsScp() ^ x.IsSCP)).GetRandom();
+                if (plr == null)
+                {
+                    CL.Error("couldn't find suitable player to replace rigged SCP role");
+                    continue;
+                }
+                Timing.CallDelayed(1f, () =>
+                {
+                    CustomRoleHelpers.SetFromCMD(plr, role);
+                });
+            }
+            Main.Instance.RiggedRoles.Clear();
         });
     }
 }

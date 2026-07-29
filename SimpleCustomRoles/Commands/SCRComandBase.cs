@@ -25,6 +25,7 @@ public sealed class SCRComandBase : ParentCommand
         RegisterCommand(new ReloadCommand());
         RegisterCommand(new SetCommand());
         RegisterCommand(new ShowCommand());
+        RegisterCommand(new RigCommand());
     }
 
     /// <inheritdoc/>
@@ -46,6 +47,9 @@ public sealed class SCRComandBase : ParentCommand
 
         if (sender.HasPermissions("scr.show"))
             response += "- show (show all current role)\n";
+
+        if (sender.HasPermissions("scr.set"))
+            response += "- rig (force role to spawn this round)\n";
 
         return false;
     }
