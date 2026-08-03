@@ -98,7 +98,7 @@ public static class CustomRoleHelpers
         }
 
         var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
-        if (!rolestorage.Role.Extra.CanOptOut)
+        if (fromOptOut && !rolestorage.Role.Extra.CanOptOut)
         {
             errorReason = "Removing denied! (Role settings)";
             return false;
