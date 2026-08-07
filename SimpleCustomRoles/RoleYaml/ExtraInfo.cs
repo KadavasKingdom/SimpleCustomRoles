@@ -18,4 +18,6 @@ public class ExtraInfo
     public bool CannotRevivedByScp049 { get; set; } = false;
 
     public bool HideFromSpectators { get; set; } = false;
+
+    public bool CanOptOut { get; set; } = true;
 }

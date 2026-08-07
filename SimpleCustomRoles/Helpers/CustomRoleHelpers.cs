@@ -98,8 +98,14 @@ public static class CustomRoleHelpers
         }
 
         var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
+        if (fromOptOut && !rolestorage.Role.Extra.CanOptOut)
+        {
+            errorReason = "Removing denied! (Role settings)";
+            return false;
+        }
 
         bool shouldrun = true;
+        // TODO: Would be great to get/set the display reason here.
         Events.TriggerRoleRemoving(player, rolestorage.Role, fromOptOut, ref shouldrun);
         if (!shouldrun)
         {
