@@ -1,5 +1,5 @@
 
 public static class AutoVersioning
 {
-	public static Version Version = new("2026.0727.08");
+	public static Version Version = new("2026.0809.00");
 }

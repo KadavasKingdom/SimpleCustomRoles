@@ -104,7 +104,7 @@ internal class ServerHandler : CustomEventsHandler
         RegularRoles.ShuffleListSecure();
 
 
-        foreach (var item in RegularRoles.Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
+        foreach (var item in RegularRoles.Concat(Main.Instance.RiggedRoles).Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
         {
             GroupHelper.DenyCustomRoles(item.Rolegroup, ref RegularRoles);
         }
