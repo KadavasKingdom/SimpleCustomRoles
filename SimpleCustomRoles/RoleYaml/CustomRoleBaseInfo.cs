@@ -6,6 +6,7 @@ namespace SimpleCustomRoles.RoleYaml;
 
 public class CustomRoleBaseInfo
 {
+    public bool Enabled { get; set; } = true;
     public string Rolename { get; set; }
     public CustomRoleType RoleType { get; set; } = CustomRoleType.Regular;
     public RoleTypeId RoleToSpawn { get; set; } = RoleTypeId.None;

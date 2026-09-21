@@ -27,7 +27,11 @@ public static class RolesLoader
 
                 try
                 {
-                    RoleInfos.Add(CustomYaml.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file)));
+                    CustomRoleBaseInfo info = CustomYaml.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file));
+                    if (!info.Enabled)
+                        continue;
+
+                    RoleInfos.Add(info);
                 }
                 catch (Exception ex)
                 {
