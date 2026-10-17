@@ -21,6 +21,9 @@ public class Config
     [Description("Showing spawn message in console")]
     public bool ShowSpawnMessage { get; set; }
 
+    [Description("Amount of time from spawning a player can opt out of their Custom Role (seconds - integer)")]
+    public int OptOutValidTime { get; set; } = 15;
+
     public Dictionary<EscapeConfig, RoleTypeId> EscapeConfigs { get; set; } = new()
     {
         {
