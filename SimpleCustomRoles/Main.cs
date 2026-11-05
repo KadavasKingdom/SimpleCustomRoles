@@ -1,4 +1,4 @@
-﻿using CustomPlayerEffects;
+using CustomPlayerEffects;
 using HarmonyLib;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features;
@@ -19,7 +19,7 @@ internal class Main : Plugin<Config>
     #region Plugin Info
     public override string Author => "SlejmUr";
     public override string Name => "SimpleCustomRoles";
-    public override Version Version => AutoVersioning.Version;
+    public override Version Version => Versioning.Version;
     public override string Description => "Add simple YAML Support for creating custom roles.";
     public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
     #endregion
