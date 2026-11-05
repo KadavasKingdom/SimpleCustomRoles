@@ -1,4 +1,5 @@
-﻿using LabApiExtensions.Extensions;
+﻿using LabApiExtensions.Configs;
+using LabApiExtensions.Extensions;
 using PlayerStatsSystem;
 using SimpleCustomRoles.RoleYaml;
 
