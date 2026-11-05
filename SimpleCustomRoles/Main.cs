@@ -14,79 +14,86 @@ namespace SimpleCustomRoles;
 
 internal class Main : Plugin<Config>
 {
-    public static Main Instance { get; private set; }
+	public static Main? Instance { get; private set; }
 
-    #region Plugin Info
-    public override string Author => "SlejmUr";
-    public override string Name => "SimpleCustomRoles";
-    public override Version Version => Versioning.Version;
-    public override string Description => "Add simple YAML Support for creating custom roles.";
-    public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
-    #endregion
+	public override string Author => "SlejmUr";
 
-    public List<CustomRoleBaseInfo> InWaveRoles = [];
-    public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
-    public List<CustomRoleBaseInfo> EscapeRoles = [];
-    public List<CustomRoleBaseInfo> RiggedRoles = [];
+	public override string Name => "SimpleCustomRoles";
 
-    private readonly List<CustomEventsHandler> handlers = 
-    [
-        new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
-        new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
-        new Scp173Handler(), new Scp330Handler(), new Scp939Handler(), new ObjectHandler(),
-    ];
+	public override Version Version => Versioning.Version;
 
-    public List<RoleBaseGroup> RoleGroups = [];
+	public override string Description => "Add simple YAML Support for creating custom roles.";
 
-    private Harmony Harmony;
+	public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
 
-    public override void Enable()
-    {
-        Instance = this;
-        CustomDataStoreManagerExtended.EnsureExists<CustomRoleInfoStorage>();
-        HelperTxts.WriteAll();
-        Logic.Init();
+	public List<CustomRoleBaseInfo> InWaveRoles = [];
+	public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
+	public List<CustomRoleBaseInfo> EscapeRoles = [];
+	public List<CustomRoleBaseInfo> RiggedRoles = [];
 
-        foreach (var item in handlers)
-        {
-            CustomHandlersManager.RegisterEventsHandler(item);
-        }
+	private readonly List<CustomEventsHandler> handlers =
+	[
+		new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
+		new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
+		new Scp173Handler(), new Scp330Handler(), new Scp939Handler(), new ObjectHandler(),
+	];
 
-        StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
-        //Harmony.DEBUG = Config.Debug;
-        Harmony = new("SimpleCustomRole");
-        Harmony.PatchAll();
-    }
+	public List<RoleBaseGroup> RoleGroups = [];
 
+	private Harmony? harmony;
 
-    public override void Disable()
-    {
-        StatusEffectBase.OnEnabled -= SubHandle.StatusEffectBase_OnEnabled;
+	public override void Enable()
+	{
+		Instance = this;
+		CustomDataStoreManagerExtended.EnsureExists<CustomRoleInfoStorage>();
+		HelperTxts.WriteAll();
+		Logic.Init();
 
-        foreach (var item in handlers)
-        {
-            CustomHandlersManager.UnregisterEventsHandler(item);
-        }
+		foreach (var item in handlers)
+		{
+			CustomHandlersManager.RegisterEventsHandler(item);
+		}
 
-        Logic.UnInit();
-        RolesLoader.Clear();
-        Harmony.UnpatchAll("SimpleCustomRole");
-        Instance = null;
-    }
+		StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
 
-    public override void LoadConfigs()
-    {
-        if (!this.TryLoadConfig(ConfigFileName, out Config config, true))
-        {
-            CL.Warn("Failed to load the configuration file, using default values.");
-            config = new();
-        }
+		// Harmony.DEBUG = Config.Debug;
+		harmony = new("SimpleCustomRole");
+		harmony.PatchAll();
+	}
 
-        Config = config;
-        var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml", config.UseGlobalDir);
-        if (list != null)
-            RoleGroups = list;
-        else
-            RoleGroups = [];
-    }
+	public override void Disable()
+	{
+		StatusEffectBase.OnEnabled -= SubHandle.StatusEffectBase_OnEnabled;
+
+		foreach (var item in handlers)
+		{
+			CustomHandlersManager.UnregisterEventsHandler(item);
+		}
+
+		Logic.UnInit();
+		RolesLoader.Clear();
+		harmony?.UnpatchAll("SimpleCustomRole");
+		harmony = null;
+		Instance = null;
+	}
+
+	public override void LoadConfigs()
+	{
+		if (!this.TryLoadConfig(ConfigFileName, out Config? config, true))
+		{
+			CL.Warn("Failed to load the configuration file, using default values.");
+			config = new();
+		}
+
+		Config = config;
+		var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml", config.UseGlobalDir);
+		if (list != null)
+		{
+			RoleGroups = list;
+		}
+		else
+		{
+			RoleGroups = [];
+		}
+	}
 }

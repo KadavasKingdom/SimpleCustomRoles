@@ -22,351 +22,427 @@ namespace SimpleCustomRoles.RoleInfo;
 
 public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 {
-    public CustomRoleBaseInfo Role;
-    public string OldCustomInfo = string.Empty;
-    public bool ResetRole { get; set; }
-    public void Apply()
-    {
-        if (Role == null)
-            return;
-        Timing.RunCoroutine(ApplyCor());
-    }
+	public CustomRoleBaseInfo? Role;
+	public string OldCustomInfo = string.Empty;
 
-    public void Reset()
-    {
-        Owner.IsBypassEnabled = false;
-        ScaleExtension.SetScale(Owner, Vector3.one);
-        Owner.Position += Vector3.up;
-        Owner.Gravity = FpcGravityController.DefaultGravity;
-        if (string.IsNullOrEmpty(OldCustomInfo))
-            OldCustomInfo = string.Empty;
-        Owner.CustomInfo = OldCustomInfo;
-        if (ResetRole)
-        {
-            PlayerRoles.RoleTypeId prevRole = Role.ReplaceRole;
-            Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
-            Timing.CallDelayed(0.2f, () => Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All));
-        }
-        Role = null;
-    }
+	public bool ResetRole { get; set; }
 
-    internal IEnumerator<float> ApplyCor()
-    {
-        yield return Timing.WaitForSeconds(0.1f);
-        SpawnToPostion();
-        yield return Timing.WaitForSeconds(0.1f);
-        MoveToLocation();
-        yield return Timing.WaitForSeconds(0.2f);
-        SetInventory();
-        SetHints(true);
-        yield return Timing.WaitForSeconds(0.2f);
-        SetMaxStats();
-        yield return Timing.WaitForSeconds(0.1f);
-        BeforeStat();
-        SetStats();
-        yield return Timing.WaitForSeconds(0.2f);
-        yield return Timing.WaitForOneFrame;
-        SpawnProt();
-        SetCommon();
-        yield return Timing.WaitForOneFrame;
-        yield return Timing.WaitForOneFrame;
-        SetFpc();
-        SetCustomInfo();
-        SetScpRoleInfos();
-        yield return Timing.WaitForOneFrame;
-    }
+	public void Apply()
+	{
+		if (Role == null)
+		{
+			return;
+		}
 
-    private void SpawnToPostion()
-    {
-        if (Role.RoleToSpawn == PlayerRoles.RoleTypeId.Scp0492)
-            Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
-        else if (Owner.Role != Role.RoleToSpawn)
-            Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All);
+		Timing.RunCoroutine(ApplyCor());
+	}
 
-        if (Role.Extra.ForceSet)
-        {
-            Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All);
-            Timing.CallDelayed(0.2f, () => Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All));
-        }
-    }
+	public void Reset()
+	{
+		Owner.IsBypassEnabled = false;
+		ScaleExtension.SetScale(Owner, Vector3.one);
+		Owner.Position += Vector3.up;
+		Owner.Gravity = FpcGravityController.DefaultGravity;
+		if (string.IsNullOrEmpty(OldCustomInfo))
+		{
+			OldCustomInfo = string.Empty;
+		}
 
-    private void MoveToLocation()
-    {
-        switch (Role.Location.Priority)
-        {
-            case LocationSpawnPriority.None:
-                break;
-            case LocationSpawnPriority.SpawnZone:
-                if (Role.Location.SpawnZones.Count > 0)
-                {
-                    var tp = Room.Get(Role.Location.SpawnZones.RandomItem()).Where(x => !Role.Location.ExludeRooms.Contains(x.Name)).ToList().RandomItem();
-                    Owner.Position = tp.AdjustRoomPosition() + Role.Location.OffsetPosition;
-                }
-                break;
-            case LocationSpawnPriority.SpawnRoom:
-                if (Role.Location.SpawnRooms.Count > 0)
-                {
-                    var tp = Room.Get(Role.Location.SpawnRooms.RandomItem()).ToList().FirstOrDefault();
-                    Owner.Position = tp.AdjustRoomPosition() + Role.Location.OffsetPosition;
-                }
-                break;
-            case LocationSpawnPriority.ExactPosition:
-                if (Role.Location.ExactPosition != Vector3.zero)
-                    Owner.Position = Role.Location.ExactPosition;
-                break;
-            case LocationSpawnPriority.FullRandom:
-                Owner.Position = Room.List.ToList().RandomItem().AdjustRoomPosition() + Role.Location.OffsetPosition;
-                break;
-            default:
-                break;
-        }
-    }
+		Owner.CustomInfo = OldCustomInfo;
+		if (ResetRole)
+		{
+			PlayerRoles.RoleTypeId prevRole = Role.ReplaceRole;
+			Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
+			Timing.CallDelayed(0.2f, () => Owner.SetRole(prevRole, PlayerRoles.RoleChangeReason.RoundStart, PlayerRoles.RoleSpawnFlags.All));
+		}
 
-    private void SetInventory()
-    {
-        if (Role.Inventory.Clear)
-        {
-            Owner.ClearInventory();
-        }
-        foreach (var item in Role.Inventory.Items)
-        {
-            var itemBase = Owner.Inventory.ServerAddItem(item, InventorySystem.Items.ItemAddReason.StartingItem);
-            if (itemBase is Firearm firearm && firearm.TryGetModule(out IPrimaryAmmoContainerModule ammo))
-            {
-                ammo.ServerModifyAmmo(ammo.AmmoMax);
-            }
-        }
-        foreach (var ammo in Role.Inventory.Ammos)
-        {
-            Owner.SetAmmo(ammo.Key, ammo.Value);
-        }
+		Role = null;
+	}
 
-        if (Role.Candy.Candies.Count != 0)
-        {
-            Scp330Item bag = null;
-            if (Owner.Items.Any(x => x is Scp330Item))
-            {
-                bag = (Scp330Item)Owner.Items.FirstOrDefault(x => x is Scp330Item);
-            }
-            else if (!Owner.IsInventoryFull)
-            {
-                bag = (Scp330Item)Owner.AddItem(ItemType.SCP330, InventorySystem.Items.ItemAddReason.StartingItem);
-            }
-            bag?.SetCandies(Role.Candy.Candies);
-            // TODO: Fix many candies addition
-        }
-        if (Main.Instance.Config.CustomItemUseName)
-        {
-            foreach (var item in Role.Inventory.CustomNames)
-            {
-                Server.RunCommand(string.Format(Main.Instance.Config.CustomItemCommand, item, Owner.PlayerId));
-            }
-        }
-        else
-        {
-            foreach (var item in Role.Inventory.CustomIds)
-            {
-                Server.RunCommand(string.Format(Main.Instance.Config.CustomItemCommand, item, Owner.PlayerId));
-            }
-        }
-    }
+	internal IEnumerator<float> ApplyCor()
+	{
+		yield return Timing.WaitForSeconds(0.1f);
+		SpawnToPostion();
+		yield return Timing.WaitForSeconds(0.1f);
+		MoveToLocation();
+		yield return Timing.WaitForSeconds(0.2f);
+		SetInventory();
+		SetHints(true);
+		yield return Timing.WaitForSeconds(0.2f);
+		SetMaxStats();
+		yield return Timing.WaitForSeconds(0.1f);
+		BeforeStat();
+		SetStats();
+		yield return Timing.WaitForSeconds(0.2f);
+		yield return Timing.WaitForOneFrame;
+		SpawnProt();
+		SetCommon();
+		yield return Timing.WaitForOneFrame;
+		yield return Timing.WaitForOneFrame;
+		SetFpc();
+		SetCustomInfo();
+		SetScpRoleInfos();
+		yield return Timing.WaitForOneFrame;
+	}
+
+	private void SpawnToPostion()
+	{
+		if (Role.RoleToSpawn == PlayerRoles.RoleTypeId.Scp0492)
+		{
+			Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.None);
+		}
+		else if (Owner.Role != Role.RoleToSpawn)
+		{
+			Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All);
+		}
+
+		if (Role.Extra.ForceSet)
+		{
+			Owner.SetRole(PlayerRoles.RoleTypeId.Spectator, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All);
+			Timing.CallDelayed(0.2f, () => Owner.SetRole(Role.RoleToSpawn, PlayerRoles.RoleChangeReason.None, PlayerRoles.RoleSpawnFlags.All));
+		}
+	}
+
+	private void MoveToLocation()
+	{
+		switch (Role.Location.Priority)
+		{
+			case LocationSpawnPriority.None:
+				break;
+			case LocationSpawnPriority.SpawnZone:
+				if (Role.Location.SpawnZones.Count > 0)
+				{
+					var tp = Room.Get(Role.Location.SpawnZones.RandomItem()).Where(x => !Role.Location.ExludeRooms.Contains(x.Name)).ToList().RandomItem();
+					Owner.Position = tp.AdjustRoomPosition() + Role.Location.OffsetPosition;
+				}
+
+				break;
+			case LocationSpawnPriority.SpawnRoom:
+				if (Role.Location.SpawnRooms.Count > 0)
+				{
+					var tp = Room.Get(Role.Location.SpawnRooms.RandomItem()).ToList().FirstOrDefault();
+					Owner.Position = tp.AdjustRoomPosition() + Role.Location.OffsetPosition;
+				}
+
+				break;
+			case LocationSpawnPriority.ExactPosition:
+				if (Role.Location.ExactPosition != Vector3.zero)
+				{
+					Owner.Position = Role.Location.ExactPosition;
+				}
+
+				break;
+			case LocationSpawnPriority.FullRandom:
+				Owner.Position = Room.List.ToList().RandomItem().AdjustRoomPosition() + Role.Location.OffsetPosition;
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void SetInventory()
+	{
+		if (Role.Inventory.Clear)
+		{
+			Owner.ClearInventory();
+		}
+
+		foreach (var item in Role.Inventory.Items)
+		{
+			var itemBase = Owner.Inventory.ServerAddItem(item, InventorySystem.Items.ItemAddReason.StartingItem);
+			if (itemBase is Firearm firearm && firearm.TryGetModule(out IPrimaryAmmoContainerModule ammo))
+			{
+				ammo.ServerModifyAmmo(ammo.AmmoMax);
+			}
+		}
+
+		foreach (var ammo in Role.Inventory.Ammos)
+		{
+			Owner.SetAmmo(ammo.Key, ammo.Value);
+		}
+
+		if (Role.Candy.Candies.Count != 0)
+		{
+			Scp330Item? bag = null;
+			if (Owner.Items.Any(x => x is Scp330Item))
+			{
+				bag = (Scp330Item)Owner.Items.FirstOrDefault(x => x is Scp330Item);
+			}
+			else if (!Owner.IsInventoryFull)
+			{
+				bag = (Scp330Item)Owner.AddItem(ItemType.SCP330, InventorySystem.Items.ItemAddReason.StartingItem);
+			}
+
+			bag?.SetCandies(Role.Candy.Candies);
+
+			// TODO: Fix many candies addition
+		}
+
+		if (Main.Instance.Config.CustomItemUseName)
+		{
+			foreach (var item in Role.Inventory.CustomNames)
+			{
+				Server.RunCommand(string.Format(Main.Instance.Config.CustomItemCommand, item, Owner.PlayerId));
+			}
+		}
+		else
+		{
+			foreach (var item in Role.Inventory.CustomIds)
+			{
+				Server.RunCommand(string.Format(Main.Instance.Config.CustomItemCommand, item, Owner.PlayerId));
+			}
+		}
+	}
 
 #if !ENABLEEFFECTHUD
-    private void BeforeStat() { }
+	private void BeforeStat()
+	{
+	}
 #endif
 
-    private void SetMaxStats()
-    {
-        float newValue = Role.Stats.MaxHealth.MathCalculation(Owner.MaxHealth);
-        if (newValue != Owner.MaxHealth)
-            Owner.MaxHealth = newValue;
+	private void SetMaxStats()
+	{
+		float newValue = Role.Stats.MaxHealth.MathCalculation(Owner.MaxHealth);
+		if (newValue != Owner.MaxHealth)
+		{
+			Owner.MaxHealth = newValue;
+		}
 
-        newValue = Role.Stats.MaxAhp.MathCalculation(Owner.MaxArtificialHealth);
-        if (newValue != Owner.MaxArtificialHealth)
-            Owner.MaxArtificialHealth = newValue;
+		newValue = Role.Stats.MaxAhp.MathCalculation(Owner.MaxArtificialHealth);
+		if (newValue != Owner.MaxArtificialHealth)
+		{
+			Owner.MaxArtificialHealth = newValue;
+		}
 
-        newValue = Role.Stats.MaxHumeShield.MathCalculation(Owner.MaxHumeShield);
-        if (newValue != Owner.MaxHumeShield)
-            Owner.MaxHumeShield = newValue;
+		newValue = Role.Stats.MaxHumeShield.MathCalculation(Owner.MaxHumeShield);
+		if (newValue != Owner.MaxHumeShield)
+		{
+			Owner.MaxHumeShield = newValue;
+		}
 
-        var maxStat = Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue;
-        newValue = Role.Stats.MaxStamina.MathCalculation(maxStat);
-        if (newValue != maxStat)
-            Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = newValue;
-    }
+		var maxStat = Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue;
+		newValue = Role.Stats.MaxStamina.MathCalculation(maxStat);
+		if (newValue != maxStat)
+		{
+			Owner.ReferenceHub.playerStats.GetModule<StaminaStat>().MaxValue = newValue;
+		}
+	}
 
-    private void SetStats()
-    {   
-        var newValue = Role.Stats.Health.MathCalculation(Owner.Health);
-        if (newValue != Owner.Health)
-            Owner.Health = newValue;
+	private void SetStats()
+	{
+		var newValue = Role.Stats.Health.MathCalculation(Owner.Health);
+		if (newValue != Owner.Health)
+		{
+			Owner.Health = newValue;
+		}
 
-        newValue = Role.Stats.Ahp.MathCalculation(Owner.ArtificialHealth);
-        if (newValue != Owner.ArtificialHealth)
-            Owner.ArtificialHealth = newValue;
+		newValue = Role.Stats.Ahp.MathCalculation(Owner.ArtificialHealth);
+		if (newValue != Owner.ArtificialHealth)
+		{
+			Owner.ArtificialHealth = newValue;
+		}
 
-        newValue = Role.Stats.HumeShield.MathCalculation(Owner.HumeShield);
-        if (newValue != Owner.HumeShield)
-            Owner.HumeShield = newValue;
+		newValue = Role.Stats.HumeShield.MathCalculation(Owner.HumeShield);
+		if (newValue != Owner.HumeShield)
+		{
+			Owner.HumeShield = newValue;
+		}
 
-        Owner.Gravity = Role.Stats.Gravity;
+		Owner.Gravity = Role.Stats.Gravity;
 
-        newValue = Role.Stats.HumeShieldRegenRate.MathCalculation(Owner.HumeShieldRegenRate);
-        if (newValue != Owner.HumeShieldRegenRate)
-            Owner.HumeShieldRegenRate = newValue;
+		newValue = Role.Stats.HumeShieldRegenRate.MathCalculation(Owner.HumeShieldRegenRate);
+		if (newValue != Owner.HumeShieldRegenRate)
+		{
+			Owner.HumeShieldRegenRate = newValue;
+		}
 
-        newValue = Role.Stats.HumeShieldRegenCooldown.MathCalculation(Owner.HumeShieldRegenCooldown);
-        if (newValue != Owner.HumeShieldRegenCooldown)
-            Owner.HumeShieldRegenCooldown = newValue;
+		newValue = Role.Stats.HumeShieldRegenCooldown.MathCalculation(Owner.HumeShieldRegenCooldown);
+		if (newValue != Owner.HumeShieldRegenCooldown)
+		{
+			Owner.HumeShieldRegenCooldown = newValue;
+		}
+		if (Owner.RoleBase is IHumeShieldedRole humeShieldedRole && humeShieldedRole.HumeShieldModule is DynamicHumeShieldController dynamicShield)
+		{
+			if (Role.Stats.ClearShieldOverHealth)
+			{
+				dynamicShield.ShieldOverHealth.ClearKeys();
+			}
 
+			foreach (var item in Role.Stats.ShieldOverHealth)
+			{
+				dynamicShield.ShieldOverHealth.AddKey(item.Key, item.Value);
+			}
+		}
+	}
 
-        if (Owner.RoleBase is IHumeShieldedRole humeShieldedRole && humeShieldedRole.HumeShieldModule is DynamicHumeShieldController dynamicShield)
-        {
-            if (Role.Stats.ClearShieldOverHealth)
-                dynamicShield.ShieldOverHealth.ClearKeys();
+	private void SetCommon()
+	{
+		float time = 0.2f;
+		if (SpawnProtected.IsProtectionEnabled && SpawnProtected.ProtectedTeams.Contains(Owner.Team))
+		{
+			time += SpawnProtected.SpawnDuration;
+		}
 
-            foreach (var item in Role.Stats.ShieldOverHealth)
-            {
-                dynamicShield.ShieldOverHealth.AddKey(item.Key, item.Value);
-            }
-        }
-    }
+		foreach (var effect in Role.Effects)
+		{
+			if (!effect.CanEnable)
+			{
+				continue;
+			}
 
-    private void SetCommon()
-    {
-        float time = 0.2f;
-        if (SpawnProtected.IsProtectionEnabled && SpawnProtected.ProtectedTeams.Contains(Owner.Team))
-            time += SpawnProtected.SpawnDuration;
-        foreach (var effect in Role.Effects)
-        {
-            if (!effect.CanEnable)
-                continue;
+			Timing.CallDelayed(time, () => Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration));
+		}
 
-            Timing.CallDelayed(time, () => Owner.EnableEffect(effect.EffectName, effect.Intensity, effect.Duration));
-        }
-        Owner.IsBypassEnabled = Role.Extra.Bypass;
-        if (Role.Extra.OpenDoorsNextToSpawn)
-        {
-            if (Owner.Room == null)
-                return;
+		Owner.IsBypassEnabled = Role.Extra.Bypass;
+		if (Role.Extra.OpenDoorsNextToSpawn)
+		{
+			if (Owner.Room == null)
+			{
+				return;
+			}
 
-            foreach (var door in Owner.Room.Doors)
-                door.IsOpened = true;
-        }
-        SpectatableVisibilityManager.SetHidden(Owner.ReferenceHub, Role.Extra.HideFromSpectators);
-    }
+			foreach (var door in Owner.Room.Doors)
+			{
+				door.IsOpened = true;
+			}
+		}
 
-    private void SetFpc()
-    {
-        // Scale
+		SpectatableVisibilityManager.SetHidden(Owner.ReferenceHub, Role.Extra.HideFromSpectators);
+	}
 
-        if (Role.Fpc.Scale != Vector3.one)
-        {
-            ScaleExtension.SetScale(Owner, Role.Fpc.Scale);
-        }
+	private void SetFpc()
+	{
+		// Scale
+		if (Role.Fpc.Scale != Vector3.one)
+		{
+			ScaleExtension.SetScale(Owner, Role.Fpc.Scale);
+		}
 
-        if (Role.Fpc.FakeScale != Vector3.one)
-        {
-            ScaleExtension.SetScale(Owner, Role.Fpc.FakeScale, true);
-        }
+		if (Role.Fpc.FakeScale != Vector3.one)
+		{
+			ScaleExtension.SetScale(Owner, Role.Fpc.FakeScale, true);
+		}
 
-        //  Appearance
-        if (Role.Fpc.Appearance != PlayerRoles.RoleTypeId.None)
-        {
-            Owner.AddFakeRole(Role.Fpc.Appearance);
-        }
-        // Voice Channel
-        if (Role.Fpc.VoiceChatChannel != VoiceChat.VoiceChatChannel.None)
-        {
-            if (Owner.VoiceModule != null)
-                Owner.VoiceModule.CurrentChannel = Role.Fpc.VoiceChatChannel;
-        }
-    }
+		// Appearance
+		if (Role.Fpc.Appearance != PlayerRoles.RoleTypeId.None)
+		{
+			Owner.AddFakeRole(Role.Fpc.Appearance);
+		}
 
-    internal void SetHints(bool sendall)
-    {
-        bool useOriginal = true;
-        if (!string.IsNullOrEmpty(Role.Hint.Broadcast))
-        {
-            useOriginal = true;
-            Events.TriggerShowBroadcast(Owner, Role, ref useOriginal);
-            if (useOriginal)
-                Server.SendBroadcast(Owner, Role.Hint.Broadcast, Role.Hint.BroadcastDuration);
-        }
-        if (!string.IsNullOrEmpty(Role.Hint.Hint))
-        {
-            useOriginal = true;
-            Events.TriggerShowHint(Owner, Role, ref useOriginal);
-            if (useOriginal)
-                Owner.SendHint(Role.Hint.Hint, Role.Hint.HintDuration);
-        }
-        if (!string.IsNullOrEmpty(Role.Hint.BroadcastAll) && sendall)
-        {
-            useOriginal = true;
-            Events.TriggerShowBroadcastAll(Owner, Role, ref useOriginal);
-            if (useOriginal)
-                Server.SendBroadcast(Role.Hint.BroadcastAll, Role.Hint.BroadcastAllDuration);
-        }
-    }
+		// Voice Channel
+		if (Role.Fpc.VoiceChatChannel != VoiceChat.VoiceChatChannel.None)
+		{
+			if (Owner.VoiceModule != null)
+			{
+				Owner.VoiceModule.CurrentChannel = Role.Fpc.VoiceChatChannel;
+			}
+		}
+	}
 
-    private void SetCustomInfo()
-    {
-        OldCustomInfo = string.Empty;
-        if (!string.IsNullOrEmpty(Owner.CustomInfo))
-            OldCustomInfo = Owner.CustomInfo;
+	internal void SetHints(bool sendall)
+	{
+		bool useOriginal = true;
+		if (!string.IsNullOrEmpty(Role.Hint.Broadcast))
+		{
+			useOriginal = true;
+			Events.TriggerShowBroadcast(Owner, Role, ref useOriginal);
+			if (useOriginal)
+			{
+				Server.SendBroadcast(Owner, Role.Hint.Broadcast, Role.Hint.BroadcastDuration);
+			}
+		}
 
-        if (Role.Display.RoleCanDisplay)
-            Owner.CustomInfo += Role.Display.AreaRoleName;
-    }
+		if (!string.IsNullOrEmpty(Role.Hint.Hint))
+		{
+			useOriginal = true;
+			Events.TriggerShowHint(Owner, Role, ref useOriginal);
+			if (useOriginal)
+			{
+				Owner.SendHint(Role.Hint.Hint, Role.Hint.HintDuration);
+			}
+		}
 
-    private void SetScpRoleInfos()
-    {
-        if (Owner.RoleBase is Scp049Role scp049Role && scp049Role != null)
-        {
-            if (scp049Role.SubroutineModule.TryGetSubroutine(out Scp049AttackAbility scp049AttackAbility))
-            {
-                Role.Scp.Scp049.AttackEffectDuration.MathCalculation(ref scp049AttackAbility._statusEffectDuration);
-            }
-        }
-        if (Owner.RoleBase is Scp106Role scp106Role && scp106Role != null)
-        {
-            if (scp106Role.SubroutineModule.TryGetSubroutine(out Scp106Attack scp106Attack))
-            {
-                Role.Scp.Scp106.AttackHitCooldown.MathCalculation(ref scp106Attack._hitCooldown);
-                Role.Scp.Scp106.AttackMissCooldown.MathCalculation(ref scp106Attack._missCooldown);
-                Role.Scp.Scp106.AttackDamage.MathCalculation(ref scp106Attack._damage);
-            }
-        }
-        if (Owner.RoleBase is Scp1507Role scp1507Role && scp1507Role != null)
-        {
-            if (scp1507Role.SubroutineModule.TryGetSubroutine(out Scp1507AttackAbility attackAbility))
-            {
-                Role.Scp.Scp1507.AttackDamage.MathCalculation(ref attackAbility._damage);
-            }
-        }
+		if (!string.IsNullOrEmpty(Role.Hint.BroadcastAll) && sendall)
+		{
+			useOriginal = true;
+			Events.TriggerShowBroadcastAll(Owner, Role, ref useOriginal);
+			if (useOriginal)
+			{
+				Server.SendBroadcast(Role.Hint.BroadcastAll, Role.Hint.BroadcastAllDuration);
+			}
+		}
+	}
 
-        if (Owner.RoleBase is Scp939Role scp939Role && scp939Role != null)
-        {
-            if (scp939Role.SubroutineModule.TryGetSubroutine(out Scp939AmnesticCloudAbility scp939AmnesticCloudAbility))
-            {
-                Role.Scp.Scp939.CloudFailCooldown.MathCalculation(ref scp939AmnesticCloudAbility._failedCooldown);
-                Role.Scp.Scp939.CloudPlacedCooldown.MathCalculation(ref scp939AmnesticCloudAbility._placedCooldown);
-            }
-        }
-    }
+	private void SetCustomInfo()
+	{
+		OldCustomInfo = string.Empty;
+		if (!string.IsNullOrEmpty(Owner.CustomInfo))
+		{
+			OldCustomInfo = Owner.CustomInfo;
+		}
 
-    private void SpawnProt()
-    {
-        if (!SpawnProtected.IsProtectionEnabled)
-            return;
+		if (Role.Display.RoleCanDisplay)
+		{
+			Owner.CustomInfo += Role.Display.AreaRoleName;
+		}
+	}
 
-        if (!SpawnProtected.ProtectedTeams.Contains(Owner.Team))
-            return;
+	private void SetScpRoleInfos()
+	{
+		if (Owner.RoleBase is Scp049Role scp049Role && scp049Role != null)
+		{
+			if (scp049Role.SubroutineModule.TryGetSubroutine(out Scp049AttackAbility scp049AttackAbility))
+			{
+				Role.Scp.Scp049.AttackEffectDuration.MathCalculation(ref scp049AttackAbility._statusEffectDuration);
+			}
+		}
 
-        float duration = SpawnProtected.SpawnDuration;
-        if (SpawnProtected.SpawnDuration == 0)
-            duration = 8;
+		if (Owner.RoleBase is Scp106Role scp106Role && scp106Role != null)
+		{
+			if (scp106Role.SubroutineModule.TryGetSubroutine(out Scp106Attack scp106Attack))
+			{
+				Role.Scp.Scp106.AttackHitCooldown.MathCalculation(ref scp106Attack._hitCooldown);
+				Role.Scp.Scp106.AttackMissCooldown.MathCalculation(ref scp106Attack._missCooldown);
+				Role.Scp.Scp106.AttackDamage.MathCalculation(ref scp106Attack._damage);
+			}
+		}
 
-        Owner.EnableEffect<SpawnProtected>(1, duration);
-    }
+		if (Owner.RoleBase is Scp1507Role scp1507Role && scp1507Role != null)
+		{
+			if (scp1507Role.SubroutineModule.TryGetSubroutine(out Scp1507AttackAbility attackAbility))
+			{
+				Role.Scp.Scp1507.AttackDamage.MathCalculation(ref attackAbility._damage);
+			}
+		}
+
+		if (Owner.RoleBase is Scp939Role scp939Role && scp939Role != null)
+		{
+			if (scp939Role.SubroutineModule.TryGetSubroutine(out Scp939AmnesticCloudAbility scp939AmnesticCloudAbility))
+			{
+				Role.Scp.Scp939.CloudFailCooldown.MathCalculation(ref scp939AmnesticCloudAbility._failedCooldown);
+				Role.Scp.Scp939.CloudPlacedCooldown.MathCalculation(ref scp939AmnesticCloudAbility._placedCooldown);
+			}
+		}
+	}
+
+	private void SpawnProt()
+	{
+		if (!SpawnProtected.IsProtectionEnabled)
+		{
+			return;
+		}
+
+		if (!SpawnProtected.ProtectedTeams.Contains(Owner.Team))
+		{
+			return;
+		}
+
+		float duration = SpawnProtected.SpawnDuration;
+		if (SpawnProtected.SpawnDuration == 0)
+		{
+			duration = 8;
+		}
+
+		Owner.EnableEffect<SpawnProtected>(1, duration);
+	}
 }

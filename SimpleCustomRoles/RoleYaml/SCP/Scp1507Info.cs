@@ -1,6 +1,6 @@
-﻿namespace SimpleCustomRoles.RoleYaml.SCP;
+namespace SimpleCustomRoles.RoleYaml.SCP;
 
 public class Scp1507Info
 {
-    public MathValueFloat AttackDamage { get; set; } = new();
+	public MathValueFloat AttackDamage { get; set; } = new();
 }

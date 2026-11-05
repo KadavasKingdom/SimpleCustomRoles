@@ -9,156 +9,184 @@ namespace SimpleCustomRoles.Helpers;
 
 public static class CustomRoleHelpers
 {
-    public static bool IsShouldSpawn(CustomRoleBaseInfo roleInfo)
-    {
-        if (roleInfo.Spawn.MinimumPlayers == -1 && roleInfo.Spawn.MaximumPlayers == -1)
-            return true;
-        if (roleInfo.Spawn.MinimumPlayers == -1 && roleInfo.Spawn.MaximumPlayers >= Server.PlayerCount)
-            return true;
-        if (roleInfo.Spawn.MinimumPlayers <= Server.PlayerCount && roleInfo.Spawn.MaximumPlayers >= Server.PlayerCount)
-            return true;
-        if (roleInfo.Spawn.MinimumPlayers <= Server.PlayerCount && roleInfo.Spawn.MaximumPlayers == -1)
-            return true;
-        return false;
-    }
+	public static bool IsShouldSpawn(CustomRoleBaseInfo roleInfo)
+	{
+		if (roleInfo.Spawn.MinimumPlayers == -1 && roleInfo.Spawn.MaximumPlayers == -1)
+		{
+			return true;
+		}
 
-    public static bool SetNewRole(Player player, NewRoleInfo newRoleInfo, bool AsEscaped = false)
-    {
-        if (newRoleInfo.RoleType != PlayerRoles.RoleTypeId.None)
-        {
-            if (AsEscaped && Main.Instance.Config.DebugEscape)
-                CL.Debug($"[{player.PlayerId}] is escaping as {newRoleInfo.RoleType}!", Main.Instance.Config.DebugEscape);
+		if (roleInfo.Spawn.MinimumPlayers == -1 && roleInfo.Spawn.MaximumPlayers >= Server.PlayerCount)
+		{
+			return true;
+		}
 
-            player.SetRole(newRoleInfo.RoleType, AsEscaped ? PlayerRoles.RoleChangeReason.Escaped : PlayerRoles.RoleChangeReason.None, newRoleInfo.Flags);
-            return true;
-        }
+		if (roleInfo.Spawn.MinimumPlayers <= Server.PlayerCount && roleInfo.Spawn.MaximumPlayers >= Server.PlayerCount)
+		{
+			return true;
+		}
 
-        CustomRoleBaseInfo customRoleInfo = null;
-        if (!string.IsNullOrEmpty(newRoleInfo.Name))
-            customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Name).FirstOrDefault();
+		if (roleInfo.Spawn.MinimumPlayers <= Server.PlayerCount && roleInfo.Spawn.MaximumPlayers == -1)
+		{
+			return true;
+		}
 
-        else if (newRoleInfo.Random.Count != 0)
-            customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Random.RandomItem()).FirstOrDefault();
+		return false;
+	}
 
-        if (customRoleInfo == null)
-        {
-            CL.Warn($"SetNewRole trying to set role as null! Info: {newRoleInfo} AsEscape: {AsEscaped}");
-            return false;
-        }
+	public static bool SetNewRole(Player player, NewRoleInfo newRoleInfo, bool asEscaped = false)
+	{
+		if (newRoleInfo.RoleType != PlayerRoles.RoleTypeId.None)
+		{
+			if (asEscaped && Main.Instance.Config.DebugEscape)
+			{
+				CL.Debug($"[{player.PlayerId}] is escaping as {newRoleInfo.RoleType}!", Main.Instance.Config.DebugEscape);
+			}
 
-        if (AsEscaped && Main.Instance.Config.DebugEscape)
-            CL.Debug($"[{player.PlayerId}] is escaping as {customRoleInfo.Rolename}!", Main.Instance.Config.DebugEscape);
+			player.SetRole(newRoleInfo.RoleType, asEscaped ? PlayerRoles.RoleChangeReason.Escaped : PlayerRoles.RoleChangeReason.None, newRoleInfo.Flags);
+			return true;
+		}
 
-        UnSetCustomInfoToPlayer(player, false);
-        Timing.CallDelayed(0.2f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
-        return true;
-    }
+		CustomRoleBaseInfo? customRoleInfo = null;
+		if (!string.IsNullOrEmpty(newRoleInfo.Name))
+		{
+			customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Name).FirstOrDefault();
+		}
+		else if (newRoleInfo.Random.Count != 0)
+		{
+			customRoleInfo = RolesLoader.RoleInfos.Where(x => x.Rolename == newRoleInfo.Random.RandomItem()).FirstOrDefault();
+		}
 
-    public static void SetFromCMD(Player player, CustomRoleBaseInfo customRoleInfo)
-    {
-        UnSetCustomInfoToPlayer(player, false);
-        Timing.CallDelayed(0.1f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
-    }
+		if (customRoleInfo == null)
+		{
+			CL.Warn($"SetNewRole trying to set role as null! Info: {newRoleInfo} AsEscape: {asEscaped}");
+			return false;
+		}
 
-    public static void SetCustomInfoToPlayer(Player player, CustomRoleBaseInfo customRoleInfo)
-    {
-        if (player == null)
-            return;
-        CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename}", Main.Instance.Config.Debug);
-        if (Contains(player))
-        {
-            CL.Debug($"SetCustomInfoToPlayer: {player.UserId} OldRole: {CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role.Rolename}", Main.Instance.Config.Debug);
-            return;
-        }
+		if (asEscaped && Main.Instance.Config.DebugEscape)
+		{
+			CL.Debug($"[{player.PlayerId}] is escaping as {customRoleInfo.Rolename}!", Main.Instance.Config.DebugEscape);
+		}
 
-        var roleStore = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
-        roleStore.Role = customRoleInfo;
-        roleStore.Apply();
-        Events.TriggerRoleAdded(player, customRoleInfo);
-        CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename} Success", Main.Instance.Config.Debug);
-    }
+		UnSetCustomInfoToPlayer(player, false);
+		Timing.CallDelayed(0.2f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
+		return true;
+	}
 
-    public static bool UnSetCustomInfoToPlayer(Player player, bool resetRole = true, bool fromOptOut = false)
-    {
-        return UnSetCustomInfoToPlayer(player, out _, resetRole, fromOptOut);
-    }
+	public static void SetFromCMD(Player player, CustomRoleBaseInfo customRoleInfo)
+	{
+		UnSetCustomInfoToPlayer(player, false);
+		Timing.CallDelayed(0.1f, () => { SetCustomInfoToPlayer(player, customRoleInfo); });
+	}
 
-    public static bool UnSetCustomInfoToPlayer(Player player, out string errorReason, bool resetRole = true, bool fromOptOut = false)
-    {
-        if (player == null)
-        {
-            errorReason = "Player is null!";
-            return false;
-        }
-            
-        if (!Contains(player))
-        {
-            errorReason = "Role not found!";
-            return false;
-        }
+	public static void SetCustomInfoToPlayer(Player player, CustomRoleBaseInfo customRoleInfo)
+	{
+		if (player == null)
+		{
+			return;
+		}
 
-        var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
-        if (fromOptOut && !rolestorage.Role.Extra.CanOptOut)
-        {
-            errorReason = "Removing denied! (Role settings)";
-            return false;
-        }
+		CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename}", Main.Instance.Config.Debug);
+		if (Contains(player))
+		{
+			CL.Debug($"SetCustomInfoToPlayer: {player.UserId} OldRole: {CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role.Rolename}", Main.Instance.Config.Debug);
+			return;
+		}
 
-        bool shouldrun = true;
-        // TODO: Would be great to get/set the display reason here.
-        Events.TriggerRoleRemoving(player, rolestorage.Role, fromOptOut, ref shouldrun);
-        if (!shouldrun)
-        {
-            errorReason = "Removing denied!";
-            return false;
-        }
+		var roleStore = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
+		roleStore.Role = customRoleInfo;
+		roleStore.Apply();
+		Events.TriggerRoleAdded(player, customRoleInfo);
+		CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename} Success", Main.Instance.Config.Debug);
+	}
 
-        rolestorage.ResetRole = resetRole;
-        Events.TriggerRoleRemoved(player, rolestorage.Role);
-        rolestorage.Reset();
-        errorReason = string.Empty;
-        return true;
-    }
+	public static bool UnSetCustomInfoToPlayer(Player player, bool resetRole = true, bool fromOptOut = false)
+	{
+		return UnSetCustomInfoToPlayer(player, out _, resetRole, fromOptOut);
+	}
 
-    public static bool TryGetCustomRole(Player player, out CustomRoleBaseInfo customRoleInfo)
-    {
-        customRoleInfo = null;
-        if (player == null)
-            return false;
-        customRoleInfo = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role;
-        return customRoleInfo is not null;
-    }
+	public static bool UnSetCustomInfoToPlayer(Player player, out string errorReason, bool resetRole = true, bool fromOptOut = false)
+	{
+		if (player == null)
+		{
+			errorReason = "Player is null!";
+			return false;
+		}
 
+		if (!Contains(player))
+		{
+			errorReason = "Role not found!";
+			return false;
+		}
 
-    public static bool TryGetCustomRoleStorage(Player player, out CustomRoleInfoStorage storage)
-    {
-        storage = null;
-        if (player == null)
-            return false;
-        storage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
-        return storage.Role is not null;
-    }
+		var rolestorage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
+		if (fromOptOut && !rolestorage.Role.Extra.CanOptOut)
+		{
+			errorReason = "Removing denied! (Role settings)";
+			return false;
+		}
 
-    public static bool Contains(Player player)
-    {
-        return TryGetCustomRole(player, out _);
-    }
+		bool shouldrun = true;
 
-    public static List<Player> GetPlayers()
-    {
-        var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
-        return [.. players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).Select(x => x.Key)];
-    }
+		// TODO: Would be great to get/set the display reason here.
+		Events.TriggerRoleRemoving(player, rolestorage.Role, fromOptOut, ref shouldrun);
+		if (!shouldrun)
+		{
+			errorReason = "Removing denied!";
+			return false;
+		}
 
-    public static Dictionary<Player, CustomRoleBaseInfo> GetPlayerAndRoles()
-    {
-        var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
-        return players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).ToDictionary(x => x.Key, x => ((CustomRoleInfoStorage)x.Value).Role);
-    }
+		rolestorage.ResetRole = resetRole;
+		Events.TriggerRoleRemoved(player, rolestorage.Role);
+		rolestorage.Reset();
+		errorReason = string.Empty;
+		return true;
+	}
 
-    public static List<CustomRoleBaseInfo> GetCurrentCustomRoles()
-    {
-        var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
-        return [.. players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).Select(x => ((CustomRoleInfoStorage)x.Value).Role)];
-    }
+	public static bool TryGetCustomRole(Player player, out CustomRoleBaseInfo customRoleInfo)
+	{
+		customRoleInfo = null;
+		if (player == null)
+		{
+			return false;
+		}
+
+		customRoleInfo = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role;
+		return customRoleInfo is not null;
+	}
+
+	public static bool TryGetCustomRoleStorage(Player player, out CustomRoleInfoStorage storage)
+	{
+		storage = null;
+		if (player == null)
+		{
+			return false;
+		}
+
+		storage = CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player);
+		return storage.Role is not null;
+	}
+
+	public static bool Contains(Player player)
+	{
+		return TryGetCustomRole(player, out _);
+	}
+
+	public static List<Player> GetPlayers()
+	{
+		var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
+		return [.. players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).Select(x => x.Key)];
+	}
+
+	public static Dictionary<Player, CustomRoleBaseInfo> GetPlayerAndRoles()
+	{
+		var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
+		return players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).ToDictionary(x => x.Key, x => ((CustomRoleInfoStorage)x.Value).Role);
+	}
+
+	public static List<CustomRoleBaseInfo> GetCurrentCustomRoles()
+	{
+		var players = CustomDataStoreManagerExtended.GetAll<CustomRoleInfoStorage>();
+		return [.. players.Where(x => x.Value is CustomRoleInfoStorage st && st != null && st.Role != null).Select(x => ((CustomRoleInfoStorage)x.Value).Role)];
+	}
 }
