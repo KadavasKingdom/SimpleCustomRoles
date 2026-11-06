@@ -31,12 +31,4 @@
 		<Reference Include="UnityEngine.PhysicsModule" Private="false" />
 		<Reference Include="YamlDotNet" Private="false" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Using Include="LabApiExtensions.Enums"/>
-		<Using Include="LabApiExtensions.Helpers"/>
-		<Using Include="LabApiExtensions.Configs"/>
-		<Using Include="LabApiExtensions.Managers"/>
-		<Using Include="LabApiExtensions.Extensions"/>
-	</ItemGroup>
 </Project>
