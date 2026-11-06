@@ -1,1 +1,0 @@
-3rd party references.

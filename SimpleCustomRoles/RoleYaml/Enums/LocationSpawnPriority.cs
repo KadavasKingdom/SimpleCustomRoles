@@ -1,10 +1,10 @@
-﻿namespace SimpleCustomRoles.RoleYaml.Enums;
+namespace SimpleCustomRoles.RoleYaml.Enums;
 
 public enum LocationSpawnPriority
 {
-    None,
-    SpawnZone,
-    SpawnRoom,
-    ExactPosition,
-    FullRandom
+	None,
+	SpawnZone,
+	SpawnRoom,
+	ExactPosition,
+	FullRandom,
 }
