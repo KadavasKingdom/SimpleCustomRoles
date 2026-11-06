@@ -1,4 +1,4 @@
-﻿using InventorySystem.Items.Usables.Scp330;
+using InventorySystem.Items.Usables.Scp330;
 using LabApi.Loader;
 using SimpleCustomRoles.RoleYaml;
 
@@ -14,7 +14,7 @@ public static class RolesLoader
 		RoleInfos.Clear();
 		if (Directory.Exists(Dir))
 		{
-			File.WriteAllText(Path.Combine(Dir, "Template.yml.d"), CustomYaml.Serializer.Serialize(CreateTemplate()));
+			File.WriteAllText(Path.Combine(Dir, "Template.yml.d"), CustomYamlParser.Serializer.Serialize(CreateTemplate()));
 			foreach (var file in Directory.GetFiles(Dir, "*.yml", SearchOption.AllDirectories))
 			{
 				if (file.Contains(".disable") || file.Contains(".d"))
@@ -31,7 +31,7 @@ public static class RolesLoader
 
 				try
 				{
-					CustomRoleBaseInfo info = CustomYaml.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file));
+					CustomRoleBaseInfo info = CustomYamlParser.Deserializer.Deserialize<CustomRoleBaseInfo>(File.ReadAllText(file));
 					if (!info.Enabled)
 					{
 						continue;
@@ -48,7 +48,7 @@ public static class RolesLoader
 		else
 		{
 			Directory.CreateDirectory(Dir);
-			File.WriteAllText(Path.Combine(Dir, "Template.yml.d"), CustomYaml.Serializer.Serialize(CreateTemplate()));
+			File.WriteAllText(Path.Combine(Dir, "Template.yml.d"), CustomYamlParser.Serializer.Serialize(CreateTemplate()));
 		}
 
 		RoleInfos = [.. RoleInfos.OrderBy(x => x.Spawn.SpawnChance)];
@@ -140,9 +140,9 @@ public static class RolesLoader
 						},
 						new()
 						{
-							RoleType = PlayerRoles.RoleTypeId.ClassD
+							RoleType = PlayerRoles.RoleTypeId.ClassD,
 						}
-					}
+					},
 				},
 			},
 			KillerToNewRole = new()
@@ -150,11 +150,11 @@ public static class RolesLoader
 				{
 					new()
 					{
-						KillerRole = PlayerRoles.RoleTypeId.Scp106
+						KillerRole = PlayerRoles.RoleTypeId.Scp106,
 					},
 					new()
 					{
-						RoleType = PlayerRoles.RoleTypeId.ClassD
+						RoleType = PlayerRoles.RoleTypeId.ClassD,
 					}
 				},
 			},
@@ -167,15 +167,15 @@ public static class RolesLoader
 						{
 							DamageType = DamageType.Firearm,
 							DamageSubType = DamageSubType.WeaponType,
-							SubType = ItemType.GunRevolver
+							SubType = ItemType.GunRevolver,
 						},
 						new()
 						{
 							Math = MathOption.Set,
-							Value = 5
+							Value = 5,
 						}
-					}
-				}
+					},
+				},
 			},
 		};
 	}

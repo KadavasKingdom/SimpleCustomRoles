@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace SimpleCustomRoles;
 
-public class Config
+public sealed class Config
 {
 	public bool Debug { get; set; }
 

@@ -5,14 +5,18 @@ using SimpleCustomRoles.Helpers;
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class OptOutCommand : ICommand
+internal sealed class OptOutCommand : ICommand
 {
+	/// <inheritdoc/>
 	public string Command => "optout";
 
+	/// <inheritdoc/>
 	public string[] Aliases => ["optoutscr"];
 
+	/// <inheritdoc/>
 	public string Description => "Opt out from your current Custom Role";
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		var player = Player.Get(sender);

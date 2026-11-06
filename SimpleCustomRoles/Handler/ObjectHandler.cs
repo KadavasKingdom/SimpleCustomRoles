@@ -5,7 +5,7 @@ using SimpleCustomRoles.RoleYaml;
 
 namespace SimpleCustomRoles.Handler;
 
-internal class ObjectHandler : CustomEventsHandler
+internal sealed class ObjectHandler : CustomEventsHandler
 {
 	public override void OnObjectiveDamagingScpCompleting(ScpDamagingObjectiveEventArgs ev)
 	{

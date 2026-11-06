@@ -1,4 +1,4 @@
-﻿using LabApiExtensions.Configs;
+using LabApiExtensions.Configs;
 using LabApiExtensions.Extensions;
 using PlayerStatsSystem;
 using SimpleCustomRoles.RoleYaml;
@@ -11,8 +11,8 @@ public static class DamageHelper
 	public static float CalculateDamage(this Dictionary<DamageMaker, MathValueFloat> dict, DamageHandlerBase damageHandlerBase, float baseDamage, DamageType damageType)
 	{
 		float newDamage = baseDamage;
-		var damageTypeEnum = dict.Where(x => x.Key.DamageType == damageType);
-		if (damageTypeEnum.Count() == 0)
+		var damageTypeEnum = dict.Where(x => x.Key.DamageType == damageType).ToList();
+		if (damageTypeEnum.Count == 0)
 		{
 			return newDamage;
 		}
@@ -37,8 +37,8 @@ public static class DamageHelper
 			}
 
 			var sent = damageTypeEnum.
-				Where(x => x.Key.DamageSubType == item && x.Key.SubType.ToString() == obj.ToString());
-			if (sent.Any())
+				Where(x => x.Key.DamageSubType == item && x.Key.SubType.ToString() == obj.ToString()).ToList();
+			if (sent.Count != 0)
 			{
 				var first = sent.First();
 				if (first.Value == null)

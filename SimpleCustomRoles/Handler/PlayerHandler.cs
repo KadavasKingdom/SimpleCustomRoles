@@ -1,4 +1,4 @@
-﻿using CustomPlayerEffects;
+using CustomPlayerEffects;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
@@ -10,7 +10,7 @@ using SimpleCustomRoles.RoleYaml.Enums;
 
 namespace SimpleCustomRoles.Handler;
 
-public class PlayerHandler : CustomEventsHandler
+internal sealed class PlayerHandler : CustomEventsHandler
 {
 	public override void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
 	{
@@ -177,9 +177,9 @@ public class PlayerHandler : CustomEventsHandler
 		var kv = role.KillerToNewRole.Where(x =>
 			x.Key.KillerCustom == role.Rolename ||
 			x.Key.KillerRole == ev.Attacker.Role ||
-			x.Key.KillerTeam == ev.Attacker.Team);
+			x.Key.KillerTeam == ev.Attacker.Team).ToList();
 
-		if (!kv.Any())
+		if (kv.Count == 0)
 		{
 			return;
 		}
@@ -210,7 +210,7 @@ public class PlayerHandler : CustomEventsHandler
 			CustomRoleHelpers.UnSetCustomInfoToPlayer(item);
 		}
 
-		foreach (var item in Main.Instance.InWaveRoles.Where(x => x.Wave.Faction == ev.Wave.Faction && x.RoleType == CustomRoleType.InWave))
+		foreach (var item in Main.InWaveRoles.Where(x => x.Wave.Faction == ev.Wave.Faction && x.RoleType == CustomRoleType.InWave))
 		{
 			if (item.Wave.SkipCheck || item.Wave.MinRequired > ev.Players.Count)
 			{
@@ -234,7 +234,7 @@ public class PlayerHandler : CustomEventsHandler
 
 		foreach (var item in tmp)
 		{
-			Main.Instance.InWaveRoles.Remove(item);
+			Main.InWaveRoles.Remove(item);
 		}
 	}
 }

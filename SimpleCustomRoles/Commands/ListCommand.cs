@@ -1,19 +1,23 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
 using SimpleCustomRoles.RoleInfo;
 
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class ListCommand : ICommand
+internal sealed class ListCommand : ICommand
 {
+	/// <inheritdoc/>
 	public string Command => "list";
 
+	/// <inheritdoc/>
 	public string[] Aliases => [];
 
+	/// <inheritdoc/>
 	public string Description => "List the Custom Role Names";
 
-	public bool Execute(ArraySegment<string> _, ICommandSender sender, out string response)
+	/// <inheritdoc/>
+	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (!sender.HasPermissions("scr.list"))
 		{

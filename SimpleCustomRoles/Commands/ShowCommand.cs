@@ -1,18 +1,22 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
 using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class ShowCommand : ICommand
+internal sealed class ShowCommand : ICommand
 {
+	/// <inheritdoc/>
 	public string Command => "show";
 
+	/// <inheritdoc/>
 	public string[] Aliases => ["current", "cur"];
 
+	/// <inheritdoc/>
 	public string Description => "List currently what player is which role.";
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (!sender.HasPermissions("scr.show"))

@@ -5,8 +5,9 @@ using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Handler;
 
-public class Scp0492Handler : CustomEventsHandler
+internal sealed class Scp0492Handler : CustomEventsHandler
 {
+	/// <inheritdoc/>
 	public override void OnScp0492ConsumingCorpse(Scp0492ConsumingCorpseEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -23,6 +24,7 @@ public class Scp0492Handler : CustomEventsHandler
 		ev.HealAmount = role.Scp.Scp0492.ConsumeHealth.MathCalculation(ev.HealAmount);
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp0492StartingConsumingCorpse(Scp0492StartingConsumingCorpseEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))

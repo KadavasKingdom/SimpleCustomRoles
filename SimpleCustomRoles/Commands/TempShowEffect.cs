@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Wrappers;
 using RemoteAdmin;
 
@@ -6,16 +6,18 @@ namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(ClientCommandHandler))]
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class TempShowEffect : ICommand
+internal sealed class TempShowEffect : ICommand
 {
+	/// <inheritdoc/>
 	public string Command => "showeffects";
 
+	/// <inheritdoc/>
 	public string[] Aliases => ["showeffects", "geteffects", "scr_ef"];
 
+	/// <inheritdoc/>
 	public string Description => "Show your current Effects";
 
-	public bool SanitizeResponse => true;
-
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (sender is not PlayerCommandSender pcs)

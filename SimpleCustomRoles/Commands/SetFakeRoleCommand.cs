@@ -1,21 +1,25 @@
-﻿using CommandSystem;
-using LabApi.Features.Wrappers;
+using CommandSystem;
 using PlayerRoles;
 using Utils;
 
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
-internal class SetFakeRoleCommand : ICommand, IUsageProvider
+internal sealed class SetFakeRoleCommand : ICommand, IUsageProvider
 {
+	/// <inheritdoc/>
 	public string Command => "setfakerole";
 
+	/// <inheritdoc/>
 	public string[] Aliases => [];
 
+	/// <inheritdoc/>
 	public string Description => "Faking a role to the players. (None will remove it)";
 
+	/// <inheritdoc/>
 	public string[] Usage => ["%role%", "%player%"];
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (arguments.Count != 2)
@@ -31,7 +35,7 @@ internal class SetFakeRoleCommand : ICommand, IUsageProvider
 			return false;
 		}
 
-		List<Player> players = [.. RAUtils.ProcessPlayerIdOrNamesList(arguments, 1, out _).Select(Player.Get)];
+		List<Player> players = [.. RAUtils.ProcessPlayerIdOrNamesList(arguments, 1, out _).Select(Player.Get).Where(x => x is not null).Select(x => x!)];
 		if (players.Count == 0)
 		{
 			response = "No players found!";

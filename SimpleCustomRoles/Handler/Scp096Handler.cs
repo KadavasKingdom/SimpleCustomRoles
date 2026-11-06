@@ -4,8 +4,9 @@ using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Handler;
 
-public class Scp096Handler : CustomEventsHandler
+internal sealed class Scp096Handler : CustomEventsHandler
 {
+	/// <inheritdoc/>
 	public override void OnScp096AddingTarget(Scp096AddingTargetEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Target, out var role))
@@ -14,6 +15,7 @@ public class Scp096Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp096PryingGate(Scp096PryingGateEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -33,6 +35,7 @@ public class Scp096Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp096Charging(Scp096ChargingEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -41,6 +44,7 @@ public class Scp096Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp096TryingNotToCry(Scp096TryingNotToCryEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -49,6 +53,7 @@ public class Scp096Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp096Enraging(Scp096EnragingEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))

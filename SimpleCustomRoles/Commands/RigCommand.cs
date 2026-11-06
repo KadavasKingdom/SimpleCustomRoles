@@ -1,25 +1,25 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
-using LabApi.Features.Wrappers;
-using LiteNetLib4Mirror.Open.Nat;
-using MapGeneration;
-using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleInfo;
-using Utils;
 
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class RigCommand : ICommand, IUsageProvider
+internal sealed class RigCommand : ICommand, IUsageProvider
 {
+	/// <inheritdoc/>
 	public string Command => "rig";
 
+	/// <inheritdoc/>
 	public string[] Aliases => [];
 
+	/// <inheritdoc/>
 	public string Description => "Forces a certain role to spawn this round (only usable during waiting for players)";
 
+	/// <inheritdoc/>
 	public string[] Usage => ["RoleName"];
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		// inherit permission from set, does basically the same thing anyways
@@ -49,7 +49,7 @@ public class RigCommand : ICommand, IUsageProvider
 			return false;
 		}
 
-		Main.Instance.RiggedRoles.Add(role);
+		Main.RiggedRoles.Add(role);
 		response = "Done!";
 		return true;
 	}

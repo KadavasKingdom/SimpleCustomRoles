@@ -6,10 +6,11 @@ using UnityEngine;
 
 namespace SimpleCustomRoles.Handler;
 
-public class PocketHandler : CustomEventsHandler
+internal sealed class PocketHandler : CustomEventsHandler
 {
-	private static readonly Dictionary<Player, Vector3> PlayerToScale = [];
+	private static readonly Dictionary<string, Vector3> PlayerToScale = [];
 
+	/// <inheritdoc/>
 	public override void OnPlayerEnteringPocketDimension(PlayerEnteringPocketDimensionEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -20,12 +21,14 @@ public class PocketHandler : CustomEventsHandler
 		ev.IsAllowed = role.Pocket.CanEnter;
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerEnteredPocketDimension(PlayerEnteredPocketDimensionEventArgs ev)
 	{
-		PlayerToScale[ev.Player] = ev.Player.Scale;
+		PlayerToScale[ev.Player.UserId] = ev.Player.Scale;
 		ScaleExtension.SetScale(ev.Player, Vector3.one);
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerLeavingPocketDimension(PlayerLeavingPocketDimensionEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -40,6 +43,7 @@ public class PocketHandler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerLeftPocketDimension(PlayerLeftPocketDimensionEventArgs ev)
 	{
 		if (!ev.IsSuccessful)
@@ -47,10 +51,10 @@ public class PocketHandler : CustomEventsHandler
 			return;
 		}
 
-		if (PlayerToScale.TryGetValue(ev.Player, out Vector3 scale))
+		if (PlayerToScale.TryGetValue(ev.Player.UserId, out Vector3 scale))
 		{
 			ScaleExtension.SetScale(ev.Player, scale);
-			PlayerToScale.Remove(ev.Player);
+			PlayerToScale.Remove(ev.Player.UserId);
 		}
 	}
 }

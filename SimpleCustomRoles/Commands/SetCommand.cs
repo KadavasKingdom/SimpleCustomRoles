@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
 using LabApi.Features.Wrappers;
 using SimpleCustomRoles.Helpers;
@@ -8,16 +8,21 @@ using Utils;
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class SetCommand : ICommand, IUsageProvider
+internal sealed class SetCommand : ICommand, IUsageProvider
 {
+	/// <inheritdoc/>
 	public string Command => "set";
 
+	/// <inheritdoc/>
 	public string[] Aliases => [];
 
+	/// <inheritdoc/>
 	public string Description => "Set the custom role with given input";
 
+	/// <inheritdoc/>
 	public string[] Usage => ["RoleName", "%player% (optional)"];
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (!sender.HasPermissions("scr.set"))
@@ -28,9 +33,15 @@ public class SetCommand : ICommand, IUsageProvider
 
 		List<Player> players = [];
 		var player = Player.Get(sender);
-		if (arguments.Count == 1 && player == null)
+		if (arguments.Count == 1)
 		{
 			response = "To execute this command provide at least 2 arguments!\nUsage: " + arguments.Array[0] + " " + this.DisplayCommandUsage();
+			return false;
+		}
+
+		if (player == null)
+		{
+			response = "Sender is not a player!";
 			return false;
 		}
 
@@ -38,7 +49,7 @@ public class SetCommand : ICommand, IUsageProvider
 		string roleName = arguments.At(0);
 		if (arguments.Count == 2)
 		{
-			players = [.. RAUtils.ProcessPlayerIdOrNamesList(arguments, 1, out _).Select(Player.Get)];
+			players = [.. RAUtils.ProcessPlayerIdOrNamesList(arguments, 1, out _).Select(Player.Get).Where(x => x is not null).Select(x => x!)];
 		}
 
 		if (players.Count == 0)

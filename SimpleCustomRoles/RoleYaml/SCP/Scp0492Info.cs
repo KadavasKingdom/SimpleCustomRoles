@@ -6,9 +6,9 @@ public class Scp0492Info
 {
 	public bool CanConsumeCorpse { get; set; } = true;
 
-	public bool CanSpawnIfNoCustom094 { get; set; } = false;
+	public bool CanSpawnIfNoCustom094 { get; set; }
 
-	public int ChanceForSpawn { get; set; } = 0;
+	public int ChanceForSpawn { get; set; }
 
 	public MathValueFloat ConsumeHealth { get; set; } = new();
 

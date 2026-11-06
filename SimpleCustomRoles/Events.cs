@@ -5,21 +5,21 @@ namespace SimpleCustomRoles;
 
 public static class Events
 {
-	public static event Action<Player, CustomRoleBaseInfo> OnRoleAdded;
+	public static event Action<Player, CustomRoleBaseInfo>? OnRoleAdded;
 
-	public static event Action<Player, CustomRoleBaseInfo> OnRoleRemoved;
+	public static event Action<Player, CustomRoleBaseInfo>? OnRoleRemoved;
 
-	public static event Action<Player, CustomRoleBaseInfo, Player> OnRoleSpectated;
+	public static event Action<Player, CustomRoleBaseInfo, Player>? OnRoleSpectated;
 
-	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnShowHint;
+	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>>? OnShowHint;
 
-	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnShowBroadcast;
+	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>>? OnShowBroadcast;
 
-	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnShowBroadcastAll;
+	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>>? OnShowBroadcastAll;
 
-	public static event Action<Player, CustomRoleBaseInfo, bool, TypeWrapper<bool>> OnRoleRemoving;
+	public static event Action<Player, CustomRoleBaseInfo, bool, TypeWrapper<bool>>? OnRoleRemoving;
 
-	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>> OnEscaping;
+	public static event Action<Player, CustomRoleBaseInfo, TypeWrapper<bool>>? OnEscaping;
 
 	internal static void TriggerRoleAdded(Player player, CustomRoleBaseInfo role)
 		=> OnRoleAdded?.Invoke(player, role);

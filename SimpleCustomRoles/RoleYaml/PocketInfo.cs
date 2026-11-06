@@ -6,5 +6,5 @@ public class PocketInfo
 
 	public bool CanExit { get; set; } = true;
 
-	public bool ForceExit { get; set; } = false;
+	public bool ForceExit { get; set; }
 }

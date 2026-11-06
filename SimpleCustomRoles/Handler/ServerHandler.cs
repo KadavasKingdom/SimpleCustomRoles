@@ -1,4 +1,4 @@
-﻿using LabApi.Events.CustomHandlers;
+using LabApi.Events.CustomHandlers;
 using LabApi.Features.Extensions;
 using LabApi.Features.Wrappers;
 using MEC;
@@ -11,12 +11,12 @@ using System.Linq;
 
 namespace SimpleCustomRoles.Handler;
 
-internal class ServerHandler : CustomEventsHandler
+internal sealed class ServerHandler : CustomEventsHandler
 {
 	public static void ReloadRoles()
 	{
-		Main.Instance.InWaveRoles = [];
-		Main.Instance.ScpSpecificRoles = [];
+		Main.InWaveRoles.Clear();
+		Main.ScpSpecificRoles.Clear();
 		RolesLoader.Load();
 		foreach (var item in RolesLoader.RoleInfos)
 		{
@@ -29,27 +29,29 @@ internal class ServerHandler : CustomEventsHandler
 			{
 				if (item.RoleType == CustomRoleType.ScpSpecific)
 				{
-					Main.Instance.ScpSpecificRoles.Add(item);
+					Main.ScpSpecificRoles.Add(item);
 				}
 
 				if (item.RoleType == CustomRoleType.InWave)
 				{
-					Main.Instance.InWaveRoles.Add(item);
+					Main.InWaveRoles.Add(item);
 				}
 			}
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnServerWaitingForPlayers()
 	{
-		Main.Instance.InWaveRoles = [];
-		Main.Instance.ScpSpecificRoles = [];
-		Main.Instance.EscapeRoles = [];
-		Main.Instance.RiggedRoles = [];
+		Main.InWaveRoles.Clear();
+		Main.ScpSpecificRoles.Clear();
+		Main.EscapeRoles.Clear();
+		Main.RiggedRoles.Clear();
 		RolesLoader.Load();
 		CL.Info("Loaded custom roles!");
 	}
 
+	/// <inheritdoc/>
 	public override void OnServerRoundStarted()
 	{
 		if (Main.Instance.Config.IsPaused)
@@ -111,12 +113,12 @@ internal class ServerHandler : CustomEventsHandler
 					isSpawning = true;
 					if (item.RoleType == CustomRoleType.ScpSpecific)
 					{
-						Main.Instance.ScpSpecificRoles.Add(item);
+						Main.ScpSpecificRoles.Add(item);
 					}
 
 					if (item.RoleType == CustomRoleType.InWave)
 					{
-						Main.Instance.InWaveRoles.Add(item);
+						Main.InWaveRoles.Add(item);
 					}
 					else
 					{
@@ -130,12 +132,12 @@ internal class ServerHandler : CustomEventsHandler
 
 		regularRoles.ShuffleListSecure();
 
-		foreach (var item in regularRoles.Concat(Main.Instance.RiggedRoles).Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
+		foreach (var item in regularRoles.Concat(Main.RiggedRoles).Where(static x => !string.IsNullOrEmpty(x.Rolegroup)).ToArray())
 		{
 			GroupHelper.DenyCustomRoles(item.Rolegroup, ref regularRoles);
 		}
 
-		var riggedAndRegularRoles = Main.Instance.RiggedRoles.Concat(regularRoles).ToList();
+		var riggedAndRegularRoles = Main.RiggedRoles.Concat(regularRoles).ToList();
 		List<Player> notRoll = [];
 		List<CustomRoleBaseInfo> rolled = new();
 		Timing.CallDelayed(0.2f, () =>
@@ -179,7 +181,7 @@ internal class ServerHandler : CustomEventsHandler
 			riggedAndRegularRoles.Clear();
 			regularRoles.Clear();
 
-			foreach (var role in Main.Instance.RiggedRoles.Where(x => !rolled.Contains(x)))
+			foreach (var role in Main.RiggedRoles.Where(x => !rolled.Contains(x)))
 			{
 				// in case for some reason the other player just didn't get selected
 				// if the role replaces an 096 or 079 it's best to get the respective other one (so you dont have overlord on the same team as 096 for example)
@@ -205,7 +207,7 @@ internal class ServerHandler : CustomEventsHandler
 				});
 			}
 
-			Main.Instance.RiggedRoles.Clear();
+			Main.RiggedRoles.Clear();
 		});
 	}
 }

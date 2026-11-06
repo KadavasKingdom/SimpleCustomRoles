@@ -6,9 +6,9 @@ public class WaveInfo
 {
 	public Faction Faction { get; set; } = Faction.Unclassified;
 
-	public int MinRequired { get; set; } = 0;
+	public int MinRequired { get; set; }
 
-	public bool SkipCheck { get; set; } = false;
+	public bool SkipCheck { get; set; }
 
-	public bool RemoveAfterSpawn { get; set; } = false;
+	public bool RemoveAfterSpawn { get; set; }
 }

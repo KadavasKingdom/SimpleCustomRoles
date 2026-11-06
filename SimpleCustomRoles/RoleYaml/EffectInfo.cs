@@ -11,7 +11,7 @@ public class EffectInfo
 	public bool CanEnable { get; set; } = true;
 
 	[Description("Effect Type to add into the user.")]
-	public string? EffectName { get; set; }
+	public string EffectName { get; set; } = string.Empty;
 
 	[Description("Duration how long the effect should last.")]
 	public float Duration { get; set; }

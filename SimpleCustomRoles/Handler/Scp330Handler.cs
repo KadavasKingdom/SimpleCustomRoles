@@ -1,12 +1,13 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Handler;
 
-internal class Scp330Handler : CustomEventsHandler
+internal sealed class Scp330Handler : CustomEventsHandler
 {
+	/// <inheritdoc/>
 	public override void OnPlayerInteractingScp330(PlayerInteractingScp330EventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -26,10 +27,11 @@ internal class Scp330Handler : CustomEventsHandler
 		ev.AllowPunishment = ev.Uses >= role.Candy.MaxTakeCandy;
 		if (ev.IsAllowed && !ev.AllowPunishment && role.Candy.ShowCandyLeft)
 		{
-			ev.Player.SendHint($"You can take { role.Candy.MaxTakeCandy - ev.Uses - 1} more candy", 2);
+			ev.Player.SendHint($"You can take {role.Candy.MaxTakeCandy - ev.Uses - 1} more candy", 2);
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerUsingItem(PlayerUsingItemEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -49,6 +51,7 @@ internal class Scp330Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerDroppingItem(PlayerDroppingItemEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))

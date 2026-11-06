@@ -1,4 +1,4 @@
-﻿using LabApi.Events.Arguments.Scp049Events;
+using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
@@ -6,8 +6,9 @@ using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Handler;
 
-public class Scp049Handler : CustomEventsHandler
+internal sealed class Scp049Handler : CustomEventsHandler
 {
+	/// <inheritdoc/>
 	public override void OnScp049Attacking(Scp049AttackingEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role) && role != null)
@@ -16,6 +17,7 @@ public class Scp049Handler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp049ResurrectingBody(Scp049ResurrectingBodyEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))
@@ -32,7 +34,7 @@ public class Scp049Handler : CustomEventsHandler
 			}
 		}
 
-		var list = Main.Instance.ScpSpecificRoles.Where(x => x.Scp.Scp0492.CanSpawnIfNoCustom094 == true).ToList();
+		var list = Main.ScpSpecificRoles.Where(x => x.Scp.Scp0492.CanSpawnIfNoCustom094 == true).ToList();
 		CL.Debug($"Resurrecting count : {list.Count}", Main.Instance.Config.Debug);
 		if (list.Count > 0)
 		{
@@ -46,11 +48,12 @@ public class Scp049Handler : CustomEventsHandler
 				{
 					CustomRoleHelpers.SetCustomInfoToPlayer(ev.Target, role);
 				});
-				Main.Instance.ScpSpecificRoles.Remove(role);
+				Main.ScpSpecificRoles.Remove(role);
 			}
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnScp049StartingResurrection(Scp049StartingResurrectionEventArgs ev)
 	{
 		if (!CustomRoleHelpers.TryGetCustomRole(ev.Target, out var role))

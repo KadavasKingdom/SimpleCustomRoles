@@ -1,11 +1,12 @@
-﻿using SimpleCustomRoles.RoleGroup;
+using SimpleCustomRoles.RoleGroup;
 using SimpleCustomRoles.RoleYaml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Helpers;
 
 public static class GroupHelper
 {
-	public static bool CanSpawn(string roleGroup, ref List<CustomRoleBaseInfo> customRoles)
+	public static bool CanSpawn(string roleGroup, [NotNull] ref List<CustomRoleBaseInfo> customRoles)
 	{
 		var group = GetGroup(roleGroup);
 		if (group == null)
@@ -22,7 +23,7 @@ public static class GroupHelper
 		return true;
 	}
 
-	public static void DenyCustomRoles(string roleGroup, ref List<CustomRoleBaseInfo> customRoles)
+	public static void DenyCustomRoles(string roleGroup, [NotNull] ref List<CustomRoleBaseInfo> customRoles)
 	{
 		var role = GetGroup(roleGroup);
 		if (role == null)
@@ -33,17 +34,17 @@ public static class GroupHelper
 		if (customRoles.Count(x => x.Rolegroup == roleGroup) > 1)
 		{
 			customRoles.RemoveAll(x => role.GroupsToDeny.Contains(x.Rolegroup));
-			customRoles.RemoveAll(x => role.RolesToDeny.Contains(x.Rolename));
+			customRoles.RemoveAll(x => x.Rolename is not null && role.RolesToDeny.Contains(x.Rolename));
 		}
 	}
 
-	public static RoleBaseGroup GetGroup(string roleGroup)
+	public static RoleBaseGroup? GetGroup(string roleGroup)
 	{
 		if (string.IsNullOrEmpty(roleGroup))
 		{
 			return null;
 		}
 
-		return Main.Instance.RoleGroups.FirstOrDefault(x => x.Name == roleGroup);
+		return Main.RoleGroups.FirstOrDefault(x => x.Name == roleGroup);
 	}
 }

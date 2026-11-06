@@ -1,10 +1,10 @@
-﻿using LabApi.Features.Wrappers;
+using LabApi.Features.Wrappers;
 using SimpleCustomRoles.Helpers;
 using UserSettings.ServerSpecific;
 
 namespace SimpleCustomRoles.SSS;
 
-internal class Logic
+internal static class Logic
 {
 	private static SSKeybindSetting? showRolekb;
 	private static ServerSpecificSettingBase[]? settings;
@@ -43,7 +43,7 @@ internal class Logic
 			return;
 		}
 
-		if (@base is SSKeybindSetting { SyncIsPressed: true } keybindSetting && keybindSetting.SettingId == showRolekb.SettingId)
+		if (@base is SSKeybindSetting { SyncIsPressed: true } keybindSetting && keybindSetting.SettingId == showRolekb?.SettingId)
 		{
 			storage.SetHints(false);
 		}

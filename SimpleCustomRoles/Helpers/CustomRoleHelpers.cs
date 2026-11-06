@@ -1,9 +1,10 @@
-﻿using LabApi.Features.Stores;
+using LabApi.Features.Stores;
 using LabApi.Features.Wrappers;
 using LabApiExtensions.Extensions;
 using MEC;
 using SimpleCustomRoles.RoleInfo;
 using SimpleCustomRoles.RoleYaml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Helpers;
 
@@ -89,7 +90,7 @@ public static class CustomRoleHelpers
 		CL.Debug($"SetCustomInfoToPlayer: {player.UserId} Role: {customRoleInfo.Rolename}", Main.Instance.Config.Debug);
 		if (Contains(player))
 		{
-			CL.Debug($"SetCustomInfoToPlayer: {player.UserId} OldRole: {CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role.Rolename}", Main.Instance.Config.Debug);
+			CL.Debug($"SetCustomInfoToPlayer: {player.UserId} OldRole: {CustomDataStore.GetOrAdd<CustomRoleInfoStorage>(player).Role?.Rolename}", Main.Instance.Config.Debug);
 			return;
 		}
 
@@ -143,7 +144,7 @@ public static class CustomRoleHelpers
 		return true;
 	}
 
-	public static bool TryGetCustomRole(Player player, out CustomRoleBaseInfo customRoleInfo)
+	public static bool TryGetCustomRole(Player? player, [NotNullWhen(true)] out CustomRoleBaseInfo? customRoleInfo)
 	{
 		customRoleInfo = null;
 		if (player == null)
@@ -155,7 +156,7 @@ public static class CustomRoleHelpers
 		return customRoleInfo is not null;
 	}
 
-	public static bool TryGetCustomRoleStorage(Player player, out CustomRoleInfoStorage storage)
+	public static bool TryGetCustomRoleStorage(Player player, [NotNullWhen(true)] out CustomRoleInfoStorage? storage)
 	{
 		storage = null;
 		if (player == null)

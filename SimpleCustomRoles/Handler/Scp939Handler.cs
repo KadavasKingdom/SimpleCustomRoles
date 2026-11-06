@@ -4,8 +4,9 @@ using SimpleCustomRoles.Helpers;
 
 namespace SimpleCustomRoles.Handler;
 
-internal class Scp939Handler : CustomEventsHandler
+internal sealed class Scp939Handler : CustomEventsHandler
 {
+	/// <inheritdoc/>
 	public override void OnScp939CreatingAmnesticCloud(Scp939CreatingAmnesticCloudEventArgs ev)
 	{
 		if (CustomRoleHelpers.TryGetCustomRole(ev.Player, out var role))

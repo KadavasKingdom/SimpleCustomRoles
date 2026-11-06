@@ -1,4 +1,4 @@
-﻿using CustomPlayerEffects;
+using CustomPlayerEffects;
 using InventorySystem;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Firearms.Modules;
@@ -19,6 +19,8 @@ using SimpleCustomRoles.RoleYaml.Enums;
 using UnityEngine;
 
 namespace SimpleCustomRoles.RoleInfo;
+
+#pragma warning disable CA1305 // Specify IFormatProvider
 
 public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner)
 {
@@ -195,7 +197,9 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 	}
 
 #if !ENABLEEFFECTHUD
+#pragma warning disable CA1822 // Mark members as static
 	private void BeforeStat()
+#pragma warning restore CA1822 // Mark members as static
 	{
 	}
 #endif
@@ -261,6 +265,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 		{
 			Owner.HumeShieldRegenCooldown = newValue;
 		}
+
 		if (Owner.RoleBase is IHumeShieldedRole humeShieldedRole && humeShieldedRole.HumeShieldModule is DynamicHumeShieldController dynamicShield)
 		{
 			if (Role.Stats.ClearShieldOverHealth)
@@ -389,7 +394,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 
 	private void SetScpRoleInfos()
 	{
-		if (Owner.RoleBase is Scp049Role scp049Role && scp049Role != null)
+		if (Owner.RoleBase is Scp049Role scp049Role)
 		{
 			if (scp049Role.SubroutineModule.TryGetSubroutine(out Scp049AttackAbility scp049AttackAbility))
 			{
@@ -397,7 +402,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 			}
 		}
 
-		if (Owner.RoleBase is Scp106Role scp106Role && scp106Role != null)
+		if (Owner.RoleBase is Scp106Role scp106Role)
 		{
 			if (scp106Role.SubroutineModule.TryGetSubroutine(out Scp106Attack scp106Attack))
 			{
@@ -407,7 +412,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 			}
 		}
 
-		if (Owner.RoleBase is Scp1507Role scp1507Role && scp1507Role != null)
+		if (Owner.RoleBase is Scp1507Role scp1507Role)
 		{
 			if (scp1507Role.SubroutineModule.TryGetSubroutine(out Scp1507AttackAbility attackAbility))
 			{
@@ -415,7 +420,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 			}
 		}
 
-		if (Owner.RoleBase is Scp939Role scp939Role && scp939Role != null)
+		if (Owner.RoleBase is Scp939Role scp939Role)
 		{
 			if (scp939Role.SubroutineModule.TryGetSubroutine(out Scp939AmnesticCloudAbility scp939AmnesticCloudAbility))
 			{

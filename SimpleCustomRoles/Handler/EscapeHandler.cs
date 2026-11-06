@@ -1,18 +1,21 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using NorthwoodLib.Pools;
 using SimpleCustomRoles.Helpers;
 using SimpleCustomRoles.RoleYaml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Handler;
 
-public class EscapeHandler : CustomEventsHandler
+internal sealed class EscapeHandler : CustomEventsHandler
 {
-	public static HashSet<Player> PlayerEscaped = [];
-	public static HashSet<Player> NeverEscape = [];
+	internal static HashSet<Player> PlayerEscaped { get; } = [];
 
+	internal static HashSet<Player> NeverEscape { get; } = [];
+
+	/// <inheritdoc/>
 	public override void OnPlayerChangedRole(PlayerChangedRoleEventArgs ev)
 	{
 		if (ev.Player != null)
@@ -21,6 +24,7 @@ public class EscapeHandler : CustomEventsHandler
 		}
 	}
 
+	/// <inheritdoc/>
 	public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
 	{
 		Player player = ev.Player;
@@ -46,7 +50,7 @@ public class EscapeHandler : CustomEventsHandler
 		}
 	}
 
-	public void EscapeDrop(Player player)
+	public static void EscapeDrop([NotNull] Player player)
 	{
 		List<Pickup> droppedItems = ListPool<Pickup>.Shared.Rent();
 		foreach (var item in player.Items.ToList())
@@ -76,7 +80,7 @@ public class EscapeHandler : CustomEventsHandler
 		});
 	}
 
-	public void EscapeAsNoRole(PlayerEscapingEventArgs ev)
+	public static void EscapeAsNoRole([NotNull] PlayerEscapingEventArgs ev)
 	{
 		if (ev.EscapeScenario is not (Escape.EscapeScenarioType.None or Escape.EscapeScenarioType.Custom))
 		{
@@ -145,7 +149,7 @@ public class EscapeHandler : CustomEventsHandler
 		CL.Debug($"[{ev.Player.PlayerId}] is escaped as: {roleTypeToEscapeTo}.", Main.Instance.Config.DebugEscape);
 	}
 
-	public void EscapeAsCustomRole(PlayerEscapingEventArgs ev, CustomRoleBaseInfo customRole)
+	public static void EscapeAsCustomRole([NotNull] PlayerEscapingEventArgs ev, [NotNull] CustomRoleBaseInfo customRole)
 	{
 		CL.Debug($"[{ev.Player.PlayerId}] Escaping as custom role {customRole.Rolename}.", Main.Instance.Config.DebugEscape);
 		if (!customRole.Escape.CanEscape)
@@ -188,7 +192,7 @@ public class EscapeHandler : CustomEventsHandler
 		{
 			if (Main.Instance.Config.DebugEscape)
 			{
-				ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENYCHECK3");
+				ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENYCHECK3");
 				CL.Debug($"[{ev.Player.PlayerId}] roleTypeToEscapeTo is None! {ev.Player.Role} {ev.Player.IsDisarmed} {roleToEscapeTo}.", Main.Instance.Config.DebugEscape);
 			}
 
@@ -203,7 +207,7 @@ public class EscapeHandler : CustomEventsHandler
 		{
 			if (Main.Instance.Config.DebugEscape)
 			{
-				ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} DENY3RDPARTY");
+				ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} DENY3RDPARTY");
 				CL.Debug($"[{ev.Player.PlayerId}] Escaping has been denied by 3rd party! {runOriginal}", Main.Instance.Config.DebugEscape);
 			}
 
@@ -214,7 +218,7 @@ public class EscapeHandler : CustomEventsHandler
 		if (Main.Instance.Config.DebugEscape)
 		{
 			CL.Debug($"[{ev.Player.PlayerId}] is escaping!", Main.Instance.Config.DebugEscape);
-			ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now.ToString("HH:mm:ss.fff")} SUCCESS");
+			ev.Player.SendConsoleMessage($"[ESCAPEDEBUG] {DateTime.Now:HH:mm:ss.fff} SUCCESS");
 		}
 
 		CustomRoleHelpers.SetNewRole(ev.Player, roleToEscapeTo, true);

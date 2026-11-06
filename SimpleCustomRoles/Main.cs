@@ -12,44 +12,86 @@ using SimpleCustomRoles.SSS;
 
 namespace SimpleCustomRoles;
 
-internal class Main : Plugin<Config>
+/// <summary>
+/// The main entry point for SimpleCustomRoles.
+/// </summary>
+internal sealed class Main : Plugin<Config>
 {
-	public static Main? Instance { get; private set; }
-
-	public override string Author => "SlejmUr";
-
-	public override string Name => "SimpleCustomRoles";
-
-	public override Version Version => Versioning.Version;
-
-	public override string Description => "Add simple YAML Support for creating custom roles.";
-
-	public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
-
-	public List<CustomRoleBaseInfo> InWaveRoles = [];
-	public List<CustomRoleBaseInfo> ScpSpecificRoles = [];
-	public List<CustomRoleBaseInfo> EscapeRoles = [];
-	public List<CustomRoleBaseInfo> RiggedRoles = [];
-
-	private readonly List<CustomEventsHandler> handlers =
+	private static Main? instance;
+	private static readonly List<CustomEventsHandler> Handlers =
 	[
 		new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
 		new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
 		new Scp173Handler(), new Scp330Handler(), new Scp939Handler(), new ObjectHandler(),
 	];
 
-	public List<RoleBaseGroup> RoleGroups = [];
+	/// <summary>
+	/// Gets the instance of SimpleCustomRoles.
+	/// </summary>
+	public static Main Instance
+	{
+		get
+		{
+			if (instance == null)
+			{
+				throw new ArgumentNullException(nameof(Instance));
+			}
+
+			return instance;
+		}
+	}
+
+	/// <summary>
+	/// Gets the in wave custom roles.
+	/// </summary>
+	public static List<CustomRoleBaseInfo> InWaveRoles { get; } = [];
+
+	/// <summary>
+	/// Gets the scp specific custom roles.
+	/// </summary>
+	public static List<CustomRoleBaseInfo> ScpSpecificRoles { get; } = [];
+
+	/// <summary>
+	/// Gets the escape custom roles.
+	/// </summary>
+	public static List<CustomRoleBaseInfo> EscapeRoles { get; } = [];
+
+	/// <summary>
+	/// Gets the rigged custom roles.
+	/// </summary>
+	public static List<CustomRoleBaseInfo> RiggedRoles { get; } = [];
+
+	/// <summary>
+	/// Gets the role groups.
+	/// </summary>
+	public static List<RoleBaseGroup> RoleGroups { get; } = [];
 
 	private Harmony? harmony;
 
+	/// <inheritdoc/>
+	public override string Author => "SlejmUr";
+
+	/// <inheritdoc/>
+	public override string Name => "SimpleCustomRoles";
+
+	/// <inheritdoc/>
+	public override Version Version => Versioning.Version;
+
+	/// <inheritdoc/>
+	public override string Description => "Add simple YAML Support for creating custom roles.";
+
+	/// <inheritdoc/>
+	public override Version RequiredApiVersion => LabApiProperties.CurrentVersion;
+
+	/// <inheritdoc/>
 	public override void Enable()
 	{
-		Instance = this;
+		instance = this;
 		CustomDataStoreManagerExtended.EnsureExists<CustomRoleInfoStorage>();
-		HelperTxts.WriteAll();
+		EnumTxtWriter.WriteAll();
 		Logic.Init();
 
-		foreach (var item in handlers)
+		foreach (var item in Handlers)
 		{
 			CustomHandlersManager.RegisterEventsHandler(item);
 		}
@@ -57,26 +99,28 @@ internal class Main : Plugin<Config>
 		StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
 
 		// Harmony.DEBUG = Config.Debug;
-		harmony = new("SimpleCustomRole");
+		harmony = new(Name);
 		harmony.PatchAll();
 	}
 
+	/// <inheritdoc/>
 	public override void Disable()
 	{
 		StatusEffectBase.OnEnabled -= SubHandle.StatusEffectBase_OnEnabled;
 
-		foreach (var item in handlers)
+		foreach (var item in Handlers)
 		{
 			CustomHandlersManager.UnregisterEventsHandler(item);
 		}
 
 		Logic.UnInit();
 		RolesLoader.Clear();
-		harmony?.UnpatchAll("SimpleCustomRole");
+		harmony?.UnpatchAll(Name);
 		harmony = null;
-		Instance = null;
+		instance = null;
 	}
 
+	/// <inheritdoc/>
 	public override void LoadConfigs()
 	{
 		if (!this.TryLoadConfig(ConfigFileName, out Config? config, true))
@@ -87,13 +131,11 @@ internal class Main : Plugin<Config>
 
 		Config = config;
 		var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml", config.UseGlobalDir);
+		RoleGroups.Clear();
+
 		if (list != null)
 		{
-			RoleGroups = list;
-		}
-		else
-		{
-			RoleGroups = [];
+			RoleGroups.AddRange(list);
 		}
 	}
 }

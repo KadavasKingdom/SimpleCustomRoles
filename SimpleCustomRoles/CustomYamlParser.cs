@@ -5,8 +5,14 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace SimpleCustomRoles;
 
-public static class CustomYaml
+/// <summary>
+/// Provides a parser for custom roles.
+/// </summary>
+public static class CustomYamlParser
 {
+	/// <summary>
+	/// Gets the serializer instance used for serializing custom role.
+	/// </summary>
 	public static ISerializer Serializer { get; } = new SerializerBuilder()
 		.WithEmissionPhaseObjectGraphVisitor(visitor => new CommentsObjectGraphVisitor(visitor.InnerVisitor))
 		.WithTypeInspector(typeInspector => new CommentGatheringTypeInspector(typeInspector))
@@ -18,6 +24,9 @@ public static class CustomYaml
 		.WithTypeConverter(new CustomColorConverter())
 		.Build();
 
+	/// <summary>
+	/// Gets the deserializer instance used for deserializing custom role.
+	/// </summary>
 	public static IDeserializer Deserializer { get; } = new DeserializerBuilder()
 		.WithNamingConvention(CamelCaseNamingConvention.Instance)
 		.IgnoreUnmatchedProperties()

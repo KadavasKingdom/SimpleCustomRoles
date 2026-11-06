@@ -26,5 +26,5 @@ public class StatsInfo
 
 	public Dictionary<float, float> ShieldOverHealth { get; set; } = [];
 
-	public bool ClearShieldOverHealth { get; set; } = false;
+	public bool ClearShieldOverHealth { get; set; }
 }

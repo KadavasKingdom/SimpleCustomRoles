@@ -1,17 +1,21 @@
-﻿using CommandSystem;
+using CommandSystem;
 using LabApi.Features.Permissions;
 
 namespace SimpleCustomRoles.Commands;
 
 [CommandHandler(typeof(SCRComandBase))]
-public class PauseCommand : ICommand
+internal sealed class PauseCommand : ICommand
 {
+	/// <inheritdoc/>
 	public string Command => "pause";
 
+	/// <inheritdoc/>
 	public string[] Aliases => [];
 
+	/// <inheritdoc/>
 	public string Description => "Pause or resume custom roles";
 
+	/// <inheritdoc/>
 	public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 	{
 		if (!sender.HasPermissions("scr.pause"))
