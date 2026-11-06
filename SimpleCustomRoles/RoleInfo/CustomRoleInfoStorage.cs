@@ -61,7 +61,7 @@ public partial class CustomRoleInfoStorage(Player owner) : CustomDataStore(owner
 		Role = null;
 	}
 
-	internal IEnumerator<float> ApplyCor()
+	private IEnumerator<float> ApplyCor()
 	{
 		yield return Timing.WaitForSeconds(0.1f);
 		SpawnToPostion();
