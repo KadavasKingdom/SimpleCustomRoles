@@ -5,7 +5,6 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp3114;
 using PlayerRoles.PlayableScps.Scp939;
 using PlayerStatsSystem;
-using SimpleCustomRoles.RoleYaml.Enums;
 
 namespace SimpleCustomRoles;
 
@@ -28,18 +27,16 @@ internal static class EnumTxtWriter
 		{ "Scp939DamageType", string.Join("\r\n", Enum.GetNames(typeof(Scp939DamageType))) },
 		{ "Scp3114DamageType", string.Join("\r\n", Enum.GetNames(typeof(Scp3114DamageHandler.HandlerType))) },
 		{ "MathOption", string.Join("\r\n", Enum.GetNames(typeof(MathOption))) },
-		{ "CustomRoleType", string.Join("\r\n", Enum.GetNames(typeof(CustomRoleType))) },
 		{ "RoleTypeId", string.Join("\r\n", Enum.GetNames(typeof(RoleTypeId))) },
 		{ "Team", string.Join("\r\n", Enum.GetNames(typeof(Team))) },
 		{ "Faction", string.Join("\r\n", Enum.GetNames(typeof(Faction))) },
-		{ "LocationSpawnPriority", string.Join("\r\n", Enum.GetNames(typeof(LocationSpawnPriority))) },
 		{ "FacilityZone", string.Join("\r\n", Enum.GetNames(typeof(FacilityZone))) },
 		{ "RoomName", string.Join("\r\n", Enum.GetNames(typeof(RoomName))) },
 		{ "EscapeScenarioType", string.Join("\r\n", Enum.GetNames(typeof(Escape.EscapeScenarioType))) },
 		{ "CandyKindID", string.Join("\r\n", Enum.GetNames(typeof(CandyKindID))) },
 	};
 
-	private static string Dir => Path.Combine(Path.Combine(Main.Instance?.GetConfigDirectory().FullName, "Roles"), "HelpTXT");
+	private static string Dir => Path.Combine(Path.Combine(Main.Instance?.GetConfigDirectory(true).FullName, "Roles"), "HelpTXT");
 
 	/// <summary>
 	/// Writes all enums into the txts.

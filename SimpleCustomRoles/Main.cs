@@ -1,14 +1,10 @@
-using CustomPlayerEffects;
 using HarmonyLib;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
-using SimpleCustomRoles.Handler;
-using SimpleCustomRoles.RoleGroup;
-using SimpleCustomRoles.RoleInfo;
-using SimpleCustomRoles.RoleYaml;
-using SimpleCustomRoles.SSS;
+using SimpleCustomRoles.Roles;
+using System.Reflection;
 
 namespace SimpleCustomRoles;
 
@@ -20,9 +16,6 @@ internal sealed class Main : Plugin<Config>
 	private static Main? instance;
 	private static readonly List<CustomEventsHandler> Handlers =
 	[
-		new ServerHandler(), new PocketHandler(), new PlayerHandler(), new EscapeHandler(),
-		new Scp0492Handler(), new Scp049Handler(), new Scp079Handler(), new Scp096Handler(),
-		new Scp173Handler(), new Scp330Handler(), new Scp939Handler(), new ObjectHandler(),
 	];
 
 	/// <summary>
@@ -40,31 +33,6 @@ internal sealed class Main : Plugin<Config>
 			return instance;
 		}
 	}
-
-	/// <summary>
-	/// Gets the in wave custom roles.
-	/// </summary>
-	public static List<CustomRoleBaseInfo> InWaveRoles { get; } = [];
-
-	/// <summary>
-	/// Gets the scp specific custom roles.
-	/// </summary>
-	public static List<CustomRoleBaseInfo> ScpSpecificRoles { get; } = [];
-
-	/// <summary>
-	/// Gets the escape custom roles.
-	/// </summary>
-	public static List<CustomRoleBaseInfo> EscapeRoles { get; } = [];
-
-	/// <summary>
-	/// Gets the rigged custom roles.
-	/// </summary>
-	public static List<CustomRoleBaseInfo> RiggedRoles { get; } = [];
-
-	/// <summary>
-	/// Gets the role groups.
-	/// </summary>
-	public static List<RoleBaseGroup> RoleGroups { get; } = [];
 
 	private Harmony? harmony;
 
@@ -87,16 +55,23 @@ internal sealed class Main : Plugin<Config>
 	public override void Enable()
 	{
 		instance = this;
-		CustomDataStoreManagerExtended.EnsureExists<CustomRoleInfoStorage>();
 		EnumTxtWriter.WriteAll();
-		Logic.Init();
 
 		foreach (var item in Handlers)
 		{
 			CustomHandlersManager.RegisterEventsHandler(item);
 		}
 
-		StatusEffectBase.OnEnabled += SubHandle.StatusEffectBase_OnEnabled;
+		SimpleCustomRoles.Roles.SimpleRole simple = new()
+		{
+			Enabled = true,
+			RoleName = "fart",
+			RoleToSpawn = PlayerRoles.RoleTypeId.ClassD,
+		};
+
+		CustomRoles.SerializeYaml(simple);
+
+		CustomRoles.SerializeYaml<ExampleRole>(new());
 
 		// Harmony.DEBUG = Config.Debug;
 		harmony = new(Name);
@@ -106,15 +81,11 @@ internal sealed class Main : Plugin<Config>
 	/// <inheritdoc/>
 	public override void Disable()
 	{
-		StatusEffectBase.OnEnabled -= SubHandle.StatusEffectBase_OnEnabled;
-
 		foreach (var item in Handlers)
 		{
 			CustomHandlersManager.UnregisterEventsHandler(item);
 		}
 
-		Logic.UnInit();
-		RolesLoader.Clear();
 		harmony?.UnpatchAll(Name);
 		harmony = null;
 		instance = null;
@@ -130,12 +101,5 @@ internal sealed class Main : Plugin<Config>
 		}
 
 		Config = config;
-		var list = this.LoadConfig<List<RoleBaseGroup>>("RoleGroups.yml", config.UseGlobalDir);
-		RoleGroups.Clear();
-
-		if (list != null)
-		{
-			RoleGroups.AddRange(list);
-		}
 	}
 }

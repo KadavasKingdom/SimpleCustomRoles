@@ -6,7 +6,7 @@ using System.Reflection;
 internal static class Versioning
 {
 	/// <summary>
-	/// The version of this assembly.
+	/// Gets the version of this assembly.
 	/// </summary>
-	public static readonly Version Version = new(typeof(Versioning).Assembly.GetCustomAttribute<AssemblyVersionAttribute>().Version);
+	public static readonly Version Version = new(typeof(Versioning).Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? "0.0.0");
 }
