@@ -48,4 +48,11 @@ public abstract class CustomRoleBase
 	/// </remarks>
 	[YamlMember(Order = -96)]
 	public virtual Team ReplaceTeam { get; internal set; } = Team.Dead;
+
+	/// <summary>
+	/// Called once when this instance is registered.
+	/// </summary>
+	public virtual void OnRegistered()
+	{
+	}
 }

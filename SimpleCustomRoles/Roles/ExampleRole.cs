@@ -8,11 +8,6 @@ namespace SimpleCustomRoles.Roles;
 /// </summary>
 internal sealed class ExampleRole : CustomRoleBase, IDisplayRole
 {
-	static ExampleRole()
-	{
-		CustomRoles.TypeMapping.Add(typeof(ExampleRole).FullName, typeof(ExampleRole));
-	}
-
 	/// <inheritdoc/>
 	public override string ParserClassName => typeof(ExampleRole).FullName;
 

@@ -2,6 +2,7 @@ using LabApi.Loader;
 using SimpleCustomRoles.Roles;
 using SimpleCustomRoles.Store;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace SimpleCustomRoles;
 
@@ -68,7 +69,84 @@ public static class CustomRoles
 		return store.TryGetCustomRole(out customRole);
 	}
 
-	public static void SerializeYaml<T>(T role)
+	/// <summary>
+	/// Register custom roles with the Calling Assembly.
+	/// </summary>
+	public static void RegisterCustomRoles()
+	{
+		Assembly assembly = Assembly.GetCallingAssembly();
+#if !DEBUG
+		if (assembly == typeof(CustomRoleBase).Assembly)
+		{
+			return;
+		}
+#endif
+		List<Type> types = [.. assembly.GetTypes().
+			Where(item =>
+				!item.IsAbstract &&
+				typeof(CustomRoleBase).IsAssignableFrom(item))];
+
+		RegisterCustomRoles([..types]);
+	}
+
+	/// <summary>
+	/// Register only <paramref name="types"/> as custom roles.
+	/// </summary>
+	/// <param name="types">Parameter array of the <see cref="Type"/> of a <see cref="CustomRoleBase"/>.</param>
+	public static void RegisterCustomRoles(params Type[] types)
+	{
+		if (types == null)
+		{
+			return;
+		}
+
+		foreach (Type type in types)
+		{
+			RegisterCustomRole(type);
+		}
+	}
+
+	/// <summary>
+	/// Register individual <paramref name="type"/> as a custom role.
+	/// </summary>
+	/// <param name="type">The <see cref="Type"/> of a <see cref="CustomRoleBase"/>.</param>
+	public static void RegisterCustomRole(Type type)
+	{
+		if (type == null)
+		{
+			return;
+		}
+
+		if (type.Equals(null))
+		{
+			return;
+		}
+
+		CL.Debug(type, Main.Instance.Config.Debug);
+		CustomRoleBase customRole = (CustomRoleBase)Activator.CreateInstance(type);
+		RegisterCustomRole(customRole);
+	}
+
+	/// <summary>
+	/// Register <paramref name="customRoleBase"/> as a custom role.
+	/// </summary>
+	/// <param name="customRoleBase">The new <see cref="CustomRoleBase"/>.</param>
+	public static void RegisterCustomRole(this CustomRoleBase? customRoleBase)
+	{
+		if (customRoleBase == null)
+		{
+			return;
+		}
+
+		RolesStore.Add(customRoleBase);
+		TypeMapping.Add(customRoleBase.ParserClassName, customRoleBase.GetType());
+		customRoleBase.OnRegistered();
+		/*
+		CustomRolesEvents.OnRegistered(customRoleBase);
+		*/
+	}
+
+	public static void Serialize<T>(T role)
 		where T : CustomRoleBase
 	{
 		string name = typeof(T).Name;
@@ -78,7 +156,7 @@ public static class CustomRoles
 		File.WriteAllText(path, yaml);
 	}
 
-	public static T ReadYaml<T>()
+	public static T Read<T>()
 		where T : CustomRoleBase
 	{
 		string name = typeof(T).Name;

@@ -62,6 +62,8 @@ internal sealed class Main : Plugin<Config>
 			CustomHandlersManager.RegisterEventsHandler(item);
 		}
 
+		CustomRoles.RegisterCustomRoles();
+
 		SimpleCustomRoles.Roles.SimpleRole simple = new()
 		{
 			Enabled = true,
@@ -69,9 +71,9 @@ internal sealed class Main : Plugin<Config>
 			RoleToSpawn = PlayerRoles.RoleTypeId.ClassD,
 		};
 
-		CustomRoles.SerializeYaml(simple);
+		CustomRoles.Serialize(simple);
 
-		CustomRoles.SerializeYaml<ExampleRole>(new());
+		CustomRoles.Serialize<ExampleRole>(new());
 
 		// Harmony.DEBUG = Config.Debug;
 		harmony = new(Name);
