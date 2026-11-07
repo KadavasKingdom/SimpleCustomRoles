@@ -22,7 +22,11 @@ internal static class IHealableEffect_IsHealable
 			foreach (Type type in assembly.GetTypes()
 				.Where(x => x.IsClass && !x.IsAbstract && interfaceType.IsAssignableFrom(x)))
 			{
-				yield return type.GetMethod(nameof(IHealableEffect.IsHealable));
+				MethodInfo method = type.GetMethod(nameof(IHealableEffect.IsHealable), BindingFlags.Instance | BindingFlags.Public);
+				if (method != null)
+				{
+					yield return method;
+				}
 			}
 		}
 	}
