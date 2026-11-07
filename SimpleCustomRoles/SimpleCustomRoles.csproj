@@ -16,7 +16,7 @@
 	
 	<!-- Nuget References -->
 	<ItemGroup>
-	  <PackageReference Include="KadavasKingdom.LabApiExtensions" Version="0.4.1.263071534" />
+	  <PackageReference Include="KadavasKingdom.LabApiExtensions" Version="0.4.2.263111216" />
 	  <PackageReference Include="Lib.Harmony" Version="2.4.3" />
 	</ItemGroup>
 
