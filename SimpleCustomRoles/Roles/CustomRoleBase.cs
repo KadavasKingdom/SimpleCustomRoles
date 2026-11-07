@@ -1,5 +1,6 @@
 using PlayerRoles;
 using SimpleCustomRoles.Attributes;
+using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
 namespace SimpleCustomRoles.Roles;
@@ -53,6 +54,22 @@ public abstract class CustomRoleBase
 	/// Called once when this instance is registered.
 	/// </summary>
 	public virtual void OnRegistered()
+	{
+	}
+
+	/// <summary>
+	/// Called when a player set to this role.
+	/// </summary>
+	/// <param name="player">The player.</param>
+	public virtual void OnSet([NotNull] Player player)
+	{
+	}
+
+	/// <summary>
+	/// Called when a player unset of this role.
+	/// </summary>
+	/// <param name="player">The player.</param>
+	public virtual void OnUnset([NotNull] Player player)
 	{
 	}
 }

@@ -13,6 +13,9 @@
 		<PackageId>KadavasKingdom.SimpleCustomRoles</PackageId>
 		<PackageTags>scpsl;labapi;labapi-plugin</PackageTags>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="Extensions\InterfaceExtensions.IAppearanceRole.cs" />
+	</ItemGroup>
 	
 	<!-- Nuget References -->
 	<ItemGroup>

@@ -1,3 +1,4 @@
+using LabApi.Features.Stores;
 using LabApi.Loader;
 using SimpleCustomRoles.Roles;
 using SimpleCustomRoles.Store;
@@ -25,9 +26,9 @@ public static class CustomRoles
 	public static List<CustomRoleBase> RolesStore { get; } = [];
 
 	/// <summary>
-	/// Gets the player custom role store.
+	/// Gets the custom roles from yaml.
 	/// </summary>
-	public static List<CustomRoleStore> PlayerRolesStore { get; } = [];
+	public static List<CustomRoleBase> YamlStore { get; } = [];
 
 	/// <summary>
 	/// Tries to get the custom role store.
@@ -35,7 +36,7 @@ public static class CustomRoles
 	/// <param name="player">The player.</param>
 	/// <param name="store">The store.</param>
 	/// <returns><see langword="true"/> if success; otherwise <see langword="false"/>.</returns>
-	public static bool TryGetCustomStore(Player? player, [NotNullWhen(true)] out CustomRoleStore? store)
+	public static bool TryGetCustomStore(this Player? player, [NotNullWhen(true)] out CustomRoleStore? store)
 	{
 		if (player == null)
 		{
@@ -43,7 +44,7 @@ public static class CustomRoles
 			return false;
 		}
 
-		store = PlayerRolesStore.FirstOrDefault(x => x.Owner == player);
+		store = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
 		return store != null;
 	}
 
@@ -53,7 +54,7 @@ public static class CustomRoles
 	/// <param name="player">The player.</param>
 	/// <param name="customRole">The custom role.</param>
 	/// <returns><see langword="true"/> if success; otherwise <see langword="false"/>.</returns>
-	public static bool TryGetCustomRole(Player? player, [NotNullWhen(true)] out CustomRoleBase? customRole)
+	public static bool TryGetCustomRole(this Player? player, [NotNullWhen(true)] out CustomRoleBase? customRole)
 	{
 		customRole = null;
 		if (player == null)
@@ -146,31 +147,88 @@ public static class CustomRoles
 		*/
 	}
 
-	public static void Serialize<T>(T role)
-		where T : CustomRoleBase
+	/// <summary>
+	/// Loads all role from config storage.
+	/// </summary>
+	public static void LoadRoles()
 	{
-		string name = typeof(T).Name;
+		string rolesPath = Path.Combine(Main.Instance.GetConfigDirectory(Main.Instance.Config.UseGlobal).FullName, "Roles");
+		if (!Directory.Exists(rolesPath))
+		{
+			Directory.CreateDirectory(rolesPath);
+			return;
+		}
 
-		string yaml = CustomRoleYamlParser.Serializer.Serialize(role);
-		string path = Path.Combine(ConfigurationLoader.GetConfigDirectory(Main.Instance, true).FullName, $"{name}.yaml");
-		File.WriteAllText(path, yaml);
+		foreach (string file in Directory.GetFiles(rolesPath, "*.yaml", SearchOption.AllDirectories))
+		{
+			if (file.Contains(".disable") || file.Contains(".d"))
+			{
+				continue;
+			}
+
+			if (!file.Contains(".yaml"))
+			{
+				continue;
+			}
+
+			try
+			{
+				CustomRoleBase info = CustomRoleYamlParser.Deserializer.Deserialize<CustomRoleBase>(File.ReadAllText(file));
+				YamlStore.Add(info);
+			}
+			catch (Exception ex)
+			{
+				CL.Error($"Loading role errored on file {file}, error: {ex}");
+			}
+		}
 	}
 
-	public static T Read<T>()
-		where T : CustomRoleBase
+	/// <summary>
+	/// Set custom role for <paramref name="player"/>.
+	/// </summary>
+	/// <param name="player">The player to set to.</param>
+	/// <param name="roleName">The name of the custom role.</param>
+	public static void SetCustomRole([NotNull] this Player player, string roleName)
 	{
-		string name = typeof(T).Name;
-		string path = Path.Combine(ConfigurationLoader.GetConfigDirectory(Main.Instance, true).FullName, $"{name}.yaml");
-		string data = File.ReadAllText(path);
-		return CustomRoleYamlParser.Deserializer.Deserialize<T>(data);
+		if (string.IsNullOrEmpty(roleName))
+		{
+			return;
+		}
+
+		CustomRoleBase? role = YamlStore.FirstOrDefault(x => x.RoleName == roleName);
+
+		// If role not found in yaml store, check added assembly.
+		role ??= RolesStore.FirstOrDefault(x => x.RoleName == roleName);
+
+		if (role == null)
+		{
+			return;
+		}
+
+		SetCustomRole(player, role);
 	}
 
-	public static CustomRoleBase? ReadYamlAsBase<T>()
-		where T : CustomRoleBase
+	/// <summary>
+	/// Set custom role for <paramref name="player"/>.
+	/// </summary>
+	/// <param name="player">The player to set to.</param>
+	/// <param name="customRoleBase">The custom role.</param>
+	public static void SetCustomRole([NotNull] this Player player, [NotNull] CustomRoleBase customRoleBase)
 	{
-		string name = typeof(T).Name;
-		string path = Path.Combine(ConfigurationLoader.GetConfigDirectory(Main.Instance, true).FullName, $"{name}.yaml");
-		string data = File.ReadAllText(path);
-		return CustomRoleYamlParser.Deserializer.Deserialize<CustomRoleBase>(data);
+		CustomRoleStore customRoleStore = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
+		customRoleStore.SetCustomRole(customRoleBase);
+		customRoleBase.OnSet(player);
+	}
+
+	/// <summary>
+	/// Unset custom role for <paramref name="player"/>.
+	/// </summary>
+	/// <param name="player">The player to set to.</param>
+	public static void UnsetCustomRole([NotNull] this Player player)
+	{
+		CustomRoleStore customRoleStore = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
+		customRoleStore.TryGetCustomRole(out var role);
+		customRoleStore.SetCustomRole(null);
+		role?.OnUnset(player);
 	}
 }

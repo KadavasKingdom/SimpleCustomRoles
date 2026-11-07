@@ -3,8 +3,6 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
-using SimpleCustomRoles.Roles;
-using System.Reflection;
 
 namespace SimpleCustomRoles;
 
@@ -63,17 +61,6 @@ internal sealed class Main : Plugin<Config>
 		}
 
 		CustomRoles.RegisterCustomRoles();
-
-		SimpleCustomRoles.Roles.SimpleRole simple = new()
-		{
-			Enabled = true,
-			RoleName = "fart",
-			RoleToSpawn = PlayerRoles.RoleTypeId.ClassD,
-		};
-
-		CustomRoles.Serialize(simple);
-
-		CustomRoles.Serialize<ExampleRole>(new());
 
 		// Harmony.DEBUG = Config.Debug;
 		harmony = new(Name);

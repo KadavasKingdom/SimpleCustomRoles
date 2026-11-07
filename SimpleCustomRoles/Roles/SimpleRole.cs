@@ -1,6 +1,7 @@
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using SimpleCustomRoles.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace SimpleCustomRoles.Roles;
@@ -8,7 +9,7 @@ namespace SimpleCustomRoles.Roles;
 /// <summary>
 /// Represent a simple custom role.
 /// </summary>
-public sealed class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEffectRole, IAppearanceRole, IScaleRole, IGravityRole, IInventoryCustomRole, ICustomInventoryRole
+public class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEffectRole, IAppearanceRole, IScaleRole, IGravityRole, IInventoryCustomRole, ICustomInventoryRole
 {
 	/// <inheritdoc/>
 	public bool CanDisplay { get; set; }
@@ -81,4 +82,19 @@ public sealed class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEf
 
 	/// <inheritdoc/>
 	public List<string> CustomNames { get; set; } = [];
+
+	/// <inheritdoc/>
+	public override void OnSet([NotNull] Player player)
+	{
+		// Same as CustomRoleInfoStorage.Apply
+	}
+
+	/// <inheritdoc/>
+	public override void OnUnset([NotNull] Player player)
+	{
+		// Same as CustomRoleInfoStorage.Reset
+		ScaleExtension.SetScale(player, Vector3.one);
+		player.Position += Vector3.up;
+		player.Gravity = FpcGravityController.DefaultGravity;
+	}
 }
