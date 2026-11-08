@@ -3,6 +3,7 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
+using SimpleCustomRoles.EventHandlers;
 
 namespace SimpleCustomRoles;
 
@@ -14,6 +15,7 @@ internal sealed class Main : Plugin<Config>
 	private static Main? instance;
 	private static readonly List<CustomEventsHandler> Handlers =
 	[
+		new CommonHandler(),
 	];
 
 	/// <summary>

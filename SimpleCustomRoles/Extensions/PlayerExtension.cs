@@ -1,5 +1,7 @@
 using InventorySystem.Items;
 using InventorySystem.Items.Usables.Scp330;
+using MEC;
+using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 
 namespace SimpleCustomRoles.Extensions;
@@ -109,5 +111,26 @@ public static class PlayerExtension
 		}
 
 		return null;
+	}
+
+	/// <summary>
+	/// Sets the player role with a delay.
+	/// </summary>
+	/// <param name="player">The player.</param>
+	/// <param name="roleToSet">The <see cref="RoleTypeId"/> which will be set..</param>
+	/// <param name="roleChangeReason">The <see cref="RoleChangeReason"/> of role change.</param>
+	/// <param name="spawnFlags">The <see cref="RoleSpawnFlags"/> of role change.</param>
+	/// <remarks>
+	/// First it sets as a spectator to ensure everything resets.
+	/// </remarks>
+	public static void SetRoleDelay(this Player player, RoleTypeId roleToSet, RoleChangeReason roleChangeReason = RoleChangeReason.None, RoleSpawnFlags spawnFlags = RoleSpawnFlags.All)
+	{
+		if (player == null)
+		{
+			return;
+		}
+
+		player.SetRole(RoleTypeId.Spectator, RoleChangeReason.None, RoleSpawnFlags.All);
+		Timing.CallDelayed(0.2f, () => player.SetRole(roleToSet, roleChangeReason, spawnFlags));
 	}
 }

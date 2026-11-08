@@ -57,6 +57,12 @@ public abstract class CustomRoleBase
 	public virtual string RoleGroup { get; internal set; } = string.Empty;
 
 	/// <summary>
+	/// Gets or sets a value indicating whether the role should be forced to set.
+	/// </summary>
+	[YamlMember(Order = -100)]
+	public virtual bool ForceSetRole { get; set; }
+
+	/// <summary>
 	/// Called once when this instance is registered.
 	/// </summary>
 	public virtual void OnRegistered()

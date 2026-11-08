@@ -8,12 +8,28 @@ namespace SimpleCustomRoles.Store;
 /// Represent a custom role store.
 /// </summary>
 /// <param name="player">The owner.</param>
-public class CustomRoleStore(Player player) : CustomDataStore(player)
+public sealed class CustomRoleStore(Player player) : CustomDataStore(player)
 {
 	/// <summary>
-	/// Gets the custom role.
+	/// Gets or sets a value indicating whether should reset the the role.
 	/// </summary>
-	protected CustomRoleBase? MyCustomRole { get; private set; }
+	public bool ShouldResetRole { get; set; }
+
+	/// <summary>
+	/// Gets or sets the original info area.
+	/// </summary>
+	public PlayerInfoArea OriginalInfoAraea { get; set; }
+
+	/// <summary>
+	/// Gets or sets the original custom info.
+	/// </summary>
+	public string OriginalCustomInfo { get; set; } = string.Empty;
+
+
+	/// <summary>
+	/// Gets or sets the custom role.
+	/// </summary>
+	private CustomRoleBase? MyCustomRole { get; set; }
 
 	/// <summary>
 	/// Tries to get the custom role.

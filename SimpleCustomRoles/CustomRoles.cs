@@ -215,6 +215,7 @@ public static class CustomRoles
 	/// <param name="customRoleBase">The custom role.</param>
 	public static void SetCustomRole([NotNull] this Player player, [NotNull] CustomRoleBase customRoleBase)
 	{
+		UnsetCustomRole(player);
 		CustomRoleStore customRoleStore = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
 		customRoleStore.SetCustomRole(customRoleBase);
 		customRoleBase.OnSet(player);

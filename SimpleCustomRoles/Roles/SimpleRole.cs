@@ -2,7 +2,9 @@ using InventorySystem.Items.Usables.Scp330;
 using MapGeneration;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using SimpleCustomRoles.Extensions;
 using SimpleCustomRoles.Interfaces;
+using SimpleCustomRoles.Store;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -149,15 +151,44 @@ public class SimpleRole : CustomRoleBase,
 	/// <inheritdoc/>
 	public override void OnSet([NotNull] Player player)
 	{
-		// Same as CustomRoleInfoStorage.Apply
+		if (RoleToSpawn == RoleTypeId.Scp0492)
+		{
+			player.SetRole(RoleToSpawn, RoleChangeReason.None, RoleSpawnFlags.None);
+		}
+		else if (player.Role != RoleToSpawn)
+		{
+			player.SetRole(RoleToSpawn, RoleChangeReason.None, RoleSpawnFlags.All);
+		}
+
+		if (ForceSetRole)
+		{
+			player.SetRoleDelay(RoleToSpawn);
+		}
+
+		InterfaceExtensions.Apply((IEffectRole)this, player);
 	}
 
 	/// <inheritdoc/>
 	public override void OnUnset([NotNull] Player player)
 	{
-		// Same as CustomRoleInfoStorage.Reset
+		CustomRoleStore roleStore = CustomRoleStore.GetOrAdd<CustomRoleStore>(player);
+
+		// Reset custom info.
+		if (string.IsNullOrEmpty(roleStore.OriginalCustomInfo))
+		{
+			roleStore.OriginalCustomInfo = string.Empty;
+		}
+
+		player.CustomInfo = roleStore.OriginalCustomInfo;
+		player.InfoArea = roleStore.OriginalInfoAraea;
+
 		ScaleExtension.SetScale(player, Vector3.one);
 		player.Position += Vector3.up;
 		player.Gravity = FpcGravityController.DefaultGravity;
+
+		if (roleStore.ShouldResetRole)
+		{
+			player.SetRoleDelay(ReplaceRole, RoleChangeReason.RoundStart);
+		}
 	}
 }
