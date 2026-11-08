@@ -5,8 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Extensions;
 
-#pragma warning disable CA1034 // Nested types should not be visible
-
 /// <summary>
 /// Provides extension for Custom Roles Interfaces.
 /// </summary>

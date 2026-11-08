@@ -51,6 +51,12 @@ public abstract class CustomRoleBase
 	public virtual Team ReplaceTeam { get; internal set; } = Team.Dead;
 
 	/// <summary>
+	/// Gets the role group.
+	/// </summary>
+	[YamlMember(Order = -99)]
+	public virtual string RoleGroup { get; internal set; } = string.Empty;
+
+	/// <summary>
 	/// Called once when this instance is registered.
 	/// </summary>
 	public virtual void OnRegistered()

@@ -1,3 +1,5 @@
+using InventorySystem.Items.Usables.Scp330;
+using MapGeneration;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using SimpleCustomRoles.Interfaces;
@@ -9,7 +11,23 @@ namespace SimpleCustomRoles.Roles;
 /// <summary>
 /// Represent a simple custom role.
 /// </summary>
-public class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEffectRole, IAppearanceRole, IScaleRole, IGravityRole, IInventoryCustomRole, ICustomInventoryRole
+public class SimpleRole : CustomRoleBase,
+	IDisplayRole,
+	IAllStatRole,
+	IEffectRole,
+	IAppearanceRole,
+	IScaleRole,
+	IGravityRole,
+	IInventoryCustomRole,
+	ICustomInventoryRole,
+	ISpawnableRole,
+	ISpawnConstrainsRole,
+	IWaveSpawnableRole,
+	ISpawnOffsetLocationRole,
+	ISpawnPositionRole,
+	ISpawnRoomLocationRole,
+	ISpawnZoneLocationRole,
+	ISpawnRandomLocationRole
 {
 	/// <inheritdoc/>
 	public bool CanDisplay { get; set; }
@@ -69,7 +87,7 @@ public class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEffectRol
 	public Vector3 Gravity { get; set; } = FpcGravityController.DefaultGravity;
 
 	/// <inheritdoc/>
-	public bool Clear { get; set; }
+	public bool ClearInventory { get; set; }
 
 	/// <inheritdoc/>
 	public List<ItemType> Items { get; set; } = [];
@@ -82,6 +100,51 @@ public class SimpleRole : CustomRoleBase, IDisplayRole, IAllStatRole, IEffectRol
 
 	/// <inheritdoc/>
 	public List<string> CustomNames { get; set; } = [];
+
+	/// <inheritdoc/>
+	public ushort SpawnChance { get; set; }
+
+	/// <inheritdoc/>
+	public uint SpawnCount { get; set; }
+
+	/// <inheritdoc/>
+	public bool SpawnChanceEditable { get; set; } = true;
+
+	/// <inheritdoc/>
+	public uint MinPlayerCount { get; set; }
+
+	/// <inheritdoc/>
+	public uint MaxPlayerCount { get; set; }
+
+	/// <inheritdoc/>
+	public Faction WaveFaction { get; set; } = Faction.Unclassified;
+
+	/// <inheritdoc/>
+	public uint MinWavePlayerCount { get; set; }
+
+	/// <inheritdoc/>
+	public uint WaveSpawnCount { get; set; }
+
+	/// <inheritdoc/>
+	public Vector3 SpawnOffset { get; set; } = Vector3.zero;
+
+	/// <inheritdoc/>
+	public Vector3 SpawnPosition { get; set; } = Vector3.zero;
+
+	/// <inheritdoc/>
+	public List<RoomName> SpawnRooms { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<FacilityZone> SpawnZones { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<RoomName> SpawnZoneExcludeRooms { get; set; } = [];
+
+	/// <inheritdoc/>
+	public bool SpawnRandomLocation { get; set; }
+
+	/// <inheritdoc/>
+	public List<CandyKindID> Candies { get; set; } = [];
 
 	/// <inheritdoc/>
 	public override void OnSet([NotNull] Player player)

@@ -1,3 +1,5 @@
+using InventorySystem.Items.Usables.Scp330;
+
 namespace SimpleCustomRoles.Interfaces;
 
 /// <summary>
@@ -8,7 +10,7 @@ public interface IInventoryCustomRole
 	/// <summary>
 	/// Gets a value indicating whether to clear the inventory.
 	/// </summary>
-	public bool Clear { get; }
+	public bool ClearInventory { get; }
 
 	/// <summary>
 	/// Gets the items to add.
@@ -19,4 +21,9 @@ public interface IInventoryCustomRole
 	/// Gets the ammos to add.
 	/// </summary>
 	public Dictionary<ItemType, ushort> Ammos { get; }
+
+	/// <summary>
+	/// Gets the candies to add.
+	/// </summary>
+	public List<CandyKindID> Candies { get; }
 }
