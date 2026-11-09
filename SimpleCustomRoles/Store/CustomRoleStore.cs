@@ -25,7 +25,6 @@ public sealed class CustomRoleStore(Player player) : CustomDataStore(player)
 	/// </summary>
 	public string OriginalCustomInfo { get; set; } = string.Empty;
 
-
 	/// <summary>
 	/// Gets or sets the custom role.
 	/// </summary>

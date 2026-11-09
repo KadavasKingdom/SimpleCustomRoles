@@ -37,4 +37,7 @@ internal sealed class ExampleRole : CustomRoleBase, IDisplayRole
 
 	/// <inheritdoc/>
 	public string ColorHex => "#FFFFFF";
+
+	/// <inheritdoc/>
+	public PlayerInfoArea? InfoArea => null;
 }

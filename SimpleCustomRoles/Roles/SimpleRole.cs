@@ -1,5 +1,6 @@
 using InventorySystem.Items.Usables.Scp330;
 using MapGeneration;
+using MEC;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using SimpleCustomRoles.Extensions;
@@ -29,7 +30,8 @@ public class SimpleRole : CustomRoleBase,
 	ISpawnPositionRole,
 	ISpawnRoomLocationRole,
 	ISpawnZoneLocationRole,
-	ISpawnRandomLocationRole
+	ISpawnRandomLocationRole,
+	ISpectatorVisibilityRole
 {
 	/// <inheritdoc/>
 	public bool CanDisplay { get; set; }
@@ -149,6 +151,12 @@ public class SimpleRole : CustomRoleBase,
 	public List<CandyKindID> Candies { get; set; } = [];
 
 	/// <inheritdoc/>
+	public PlayerInfoArea? InfoArea { get; set; }
+
+	/// <inheritdoc/>
+	public bool IsHiddenFromSpectators { get; set; }
+
+	/// <inheritdoc/>
 	public override void OnSet([NotNull] Player player)
 	{
 		if (RoleToSpawn == RoleTypeId.Scp0492)
@@ -165,7 +173,49 @@ public class SimpleRole : CustomRoleBase,
 			player.SetRoleDelay(RoleToSpawn);
 		}
 
-		InterfaceExtensions.Apply((IEffectRole)this, player);
+		CustomRoleStore roleStore = CustomRoleStore.GetOrAdd<CustomRoleStore>(player);
+		roleStore.OriginalCustomInfo = player.CustomInfo;
+		roleStore.OriginalInfoAraea = player.InfoArea;
+
+		if (InfoArea.HasValue)
+		{
+			player.InfoArea = InfoArea.Value;
+		}
+
+		if (CanDisplay)
+		{
+			player.CustomInfo += NameDisplay;
+		}
+
+		Timing.CallDelayed(0.3f, () =>
+		{
+			// Move player to specified location (if set)
+			InterfaceExtensions.Apply((ISpawnPositionRole)this, player);
+			InterfaceExtensions.Apply((ISpawnRandomLocationRole)this, player);
+			InterfaceExtensions.Apply((ISpawnRoomLocationRole)this, player);
+			InterfaceExtensions.Apply((ISpawnZoneLocationRole)this, player);
+
+			// Set inventory.
+			InterfaceExtensions.Apply((IInventoryCustomRole)this, player);
+			InterfaceExtensions.Apply((ICustomInventoryRole)this, player);
+
+			// Set stats.
+			InterfaceExtensions.Apply((IAhpStatRole)this, player);
+			InterfaceExtensions.Apply((IHealthStatRole)this, player);
+			InterfaceExtensions.Apply((IHumeShieldStatRole)this, player);
+			InterfaceExtensions.Apply((IStaminaStatRole)this, player);
+
+			// Common stuff
+			InterfaceExtensions.Apply((IEffectRole)this, player);
+
+			// Fpc related
+			InterfaceExtensions.Apply((IAppearanceRole)this, player);
+			InterfaceExtensions.Apply((IScaleRole)this, player);
+
+			InterfaceExtensions.Apply((ISpectatorVisibilityRole)this, player);
+
+			player.TryApplySpawnprotection();
+		});
 	}
 
 	/// <inheritdoc/>

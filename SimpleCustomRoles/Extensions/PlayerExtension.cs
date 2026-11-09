@@ -1,3 +1,4 @@
+using CustomPlayerEffects;
 using InventorySystem.Items;
 using InventorySystem.Items.Usables.Scp330;
 using MEC;
@@ -132,5 +133,35 @@ public static class PlayerExtension
 
 		player.SetRole(RoleTypeId.Spectator, RoleChangeReason.None, RoleSpawnFlags.All);
 		Timing.CallDelayed(0.2f, () => player.SetRole(roleToSet, roleChangeReason, spawnFlags));
+	}
+
+	/// <summary>
+	/// Tries to apply spawn protection to <paramref name="player"/> if the team is protected.
+	/// </summary>
+	/// <param name="player">The player.</param>
+	public static void TryApplySpawnprotection(this Player player)
+	{
+		if (player == null)
+		{
+			return;
+		}
+
+		if (!SpawnProtected.IsProtectionEnabled)
+		{
+			return;
+		}
+
+		if (!SpawnProtected.ProtectedTeams.Contains(player.Team))
+		{
+			return;
+		}
+
+		float duration = SpawnProtected.SpawnDuration;
+		if (SpawnProtected.SpawnDuration == 0)
+		{
+			return;
+		}
+
+		player.EnableEffect<SpawnProtected>(1, duration);
 	}
 }

@@ -29,4 +29,12 @@ public interface IDisplayRole
 	/// Gets the color hex value to display.
 	/// </summary>
 	public string ColorHex { get; }
+
+	/// <summary>
+	/// Gets the player info area.
+	/// </summary>
+	/// <remarks>
+	/// When value is <see langword="null"/>, it will not override it.
+	/// </remarks>
+	public PlayerInfoArea? InfoArea { get; }
 }
