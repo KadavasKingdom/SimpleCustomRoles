@@ -1,5 +1,6 @@
 using LabApi.Features.Stores;
 using SimpleCustomRoles.Roles;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Store;
@@ -48,5 +49,14 @@ public sealed class CustomRoleStore(Player player) : CustomDataStore(player)
 	public void SetCustomRole(CustomRoleBase? role)
 	{
 		MyCustomRole = role;
+	}
+
+	/// <summary>
+	/// Checks whenever the player has a custom role.
+	/// </summary>
+	/// <returns><see langword="true"/> if success; otherwise <see langword="false"/>.</returns>
+	public bool HasCustomRole()
+	{
+		return MyCustomRole != null;
 	}
 }

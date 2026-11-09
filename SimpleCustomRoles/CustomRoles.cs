@@ -31,6 +31,16 @@ public static class CustomRoles
 	public static List<CustomRoleBase> YamlStore { get; } = [];
 
 	/// <summary>
+	/// Gets the roles to spawn in this round.
+	/// </summary>
+	public static List<CustomRoleBase> RolesToSpawn { get; } = [];
+
+	/// <summary>
+	/// Gets the roles spawned in this round.
+	/// </summary>
+	public static List<CustomRoleBase> RolesSpawned { get; } = [];
+
+	/// <summary>
 	/// Tries to get the custom role store.
 	/// </summary>
 	/// <param name="player">The player.</param>
@@ -68,6 +78,21 @@ public static class CustomRoles
 		}
 
 		return store.TryGetCustomRole(out customRole);
+	}
+
+	/// <summary>
+	/// Checks whenever the <paramref name="roleName"/> found.
+	/// </summary>
+	/// <param name="roleName">The name of the role.</param>
+	/// <returns><see langword="true"/> if success; otherwise <see langword="false"/>.</returns>
+	public static bool HasRoleName(string roleName)
+	{
+		CustomRoleBase? role = YamlStore.FirstOrDefault(x => x.RoleName == roleName);
+
+		// If role not found in yaml store, check added assembly.
+		role ??= RolesStore.FirstOrDefault(x => x.RoleName == roleName);
+
+		return role != null;
 	}
 
 	/// <summary>
@@ -231,5 +256,18 @@ public static class CustomRoles
 		customRoleStore.TryGetCustomRole(out var role);
 		customRoleStore.SetCustomRole(null);
 		role?.OnUnset(player);
+	}
+
+	/// <summary>
+	/// Get all players who has custom roles.
+	/// </summary>
+	/// <returns>The list of players.</returns>
+	public static List<Player> GetPlayers()
+	{
+		var players = CustomDataStoreManagerExtended.GetAll<CustomRoleStore>();
+		return [.. players.Where(store =>
+			store.Value is CustomRoleStore customRoleStore &&
+			customRoleStore != null &&
+			customRoleStore.HasCustomRole()).Select(x => x.Key)];
 	}
 }
