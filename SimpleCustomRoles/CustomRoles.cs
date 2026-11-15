@@ -1,5 +1,6 @@
 using LabApi.Features.Stores;
 using LabApi.Loader;
+using PlayerRoles;
 using SimpleCustomRoles.Roles;
 using SimpleCustomRoles.Store;
 using System.Diagnostics.CodeAnalysis;
@@ -164,9 +165,7 @@ public static class CustomRoles
 		RolesStore.Add(customRoleBase);
 		TypeMapping.Add(customRoleBase.ParserClassName, customRoleBase.GetType());
 		customRoleBase.OnRegistered();
-		/*
 		CustomRolesEvents.OnRegistered(customRoleBase);
-		*/
 	}
 
 	/// <summary>
@@ -181,14 +180,16 @@ public static class CustomRoles
 			return;
 		}
 
-		foreach (string file in Directory.GetFiles(rolesPath, "*.yaml", SearchOption.AllDirectories))
+		foreach (string file in Directory.GetFiles(rolesPath, "*.*", SearchOption.AllDirectories))
 		{
-			if (file.Contains(".disable") || file.Contains(".d"))
+			if (file.Contains(".disable") || file.Contains(".d") || file.Contains(".txt"))
 			{
 				continue;
 			}
 
-			if (!file.Contains(".yaml"))
+			bool isYaml = file.EndsWith(".yaml", StringComparison.CurrentCultureIgnoreCase) || file.EndsWith(".yml", StringComparison.CurrentCultureIgnoreCase);
+
+			if (!isYaml)
 			{
 				continue;
 			}
@@ -197,6 +198,7 @@ public static class CustomRoles
 			{
 				CustomRoleBase info = CustomRoleYamlParser.Deserializer.Deserialize<CustomRoleBase>(File.ReadAllText(file));
 				YamlStore.Add(info);
+				CustomRolesEvents.OnYamlAdded(info);
 			}
 			catch (Exception ex)
 			{
@@ -241,6 +243,7 @@ public static class CustomRoles
 		CustomRoleStore customRoleStore = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
 		customRoleStore.SetCustomRole(customRoleBase);
 		customRoleBase.OnSet(player);
+		CustomRolesEvents.OnSetRole(customRoleBase, player);
 	}
 
 	/// <summary>
@@ -252,7 +255,11 @@ public static class CustomRoles
 		CustomRoleStore customRoleStore = CustomDataStore.GetOrAdd<CustomRoleStore>(player);
 		customRoleStore.TryGetCustomRole(out var role);
 		customRoleStore.SetCustomRole(null);
-		role?.OnUnset(player);
+		if (role != null)
+		{
+			role.OnUnset(player);
+			CustomRolesEvents.OnUnSetRole(role, player);
+		}
 	}
 
 	/// <summary>

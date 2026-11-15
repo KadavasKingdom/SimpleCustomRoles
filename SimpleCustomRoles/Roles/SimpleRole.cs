@@ -31,7 +31,12 @@ public class SimpleRole : CustomRoleBase,
 	ISpawnRoomLocationRole,
 	ISpawnZoneLocationRole,
 	ISpawnRandomLocationRole,
-	ISpectatorVisibilityRole
+	ISpectatorVisibilityRole,
+	ITakeCandyRole,
+	IDroppableRole,
+	IUsableItemRole,
+	IPocketDimensionRole,
+	IEscapeableRole
 {
 	/// <inheritdoc/>
 	public bool CanDisplay { get; set; }
@@ -155,6 +160,39 @@ public class SimpleRole : CustomRoleBase,
 
 	/// <inheritdoc/>
 	public bool IsHiddenFromSpectators { get; set; }
+
+	/// <inheritdoc/>
+	public bool TakeCandyEnabled { get; set; } = true;
+
+	/// <inheritdoc/>
+	public int TakeCandyMax { get; set; } = 2;
+
+	/// <inheritdoc/>
+	public List<ItemType> CannotDropItems { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<CandyKindID> CannotDropCandies { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<ItemType> CannotUserItems { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<CandyKindID> CannotUserCandies { get; set; } = [];
+
+	/// <inheritdoc/>
+	public bool PocketCanEnter { get; set; } = true;
+
+	/// <inheritdoc/>
+	public bool PocketCanLeave { get; set; } = true;
+
+	/// <inheritdoc/>
+	public bool PocketForceSuccess { get; set; }
+
+	/// <inheritdoc/>
+	public bool PocketForceFail { get; set; }
+
+	/// <inheritdoc/>
+	public bool CanEscape { get; set; }
 
 	/// <inheritdoc/>
 	public override void OnSet([NotNull] Player player)
