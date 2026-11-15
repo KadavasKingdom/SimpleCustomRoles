@@ -107,10 +107,7 @@ public static class CustomRoles
 			return;
 		}
 #endif
-		List<Type> types = [.. assembly.GetTypes().
-			Where(item =>
-				!item.IsAbstract &&
-				typeof(CustomRoleBase).IsAssignableFrom(item))];
+		List<Type> types = [.. assembly.GetTypes().Where(item => !item.IsAbstract && typeof(CustomRoleBase).IsAssignableFrom(item))];
 
 		RegisterCustomRoles([..types]);
 	}
@@ -265,9 +262,6 @@ public static class CustomRoles
 	public static List<Player> GetPlayers()
 	{
 		var players = CustomDataStoreManagerExtended.GetAll<CustomRoleStore>();
-		return [.. players.Where(store =>
-			store.Value is CustomRoleStore customRoleStore &&
-			customRoleStore != null &&
-			customRoleStore.HasCustomRole()).Select(x => x.Key)];
+		return [.. players.Where(store => store.Value is CustomRoleStore customRoleStore && customRoleStore != null && customRoleStore.HasCustomRole()).Select(x => x.Key)];
 	}
 }

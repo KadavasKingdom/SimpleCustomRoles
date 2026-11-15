@@ -36,7 +36,7 @@ internal static class EnumTxtWriter
 		{ "CandyKindID", string.Join("\r\n", Enum.GetNames(typeof(CandyKindID))) },
 	};
 
-	private static string Dir => Path.Combine(Path.Combine(Main.Instance?.GetConfigDirectory(true).FullName, "Roles"), "HelpTXT");
+	private static string Dir => Path.Combine(Main.Instance?.GetConfigDirectory(true).FullName, "Roles", "HelpTXT");
 
 	/// <summary>
 	/// Writes all enums into the txts.
