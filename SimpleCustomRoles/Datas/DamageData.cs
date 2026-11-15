@@ -12,7 +12,7 @@ public record class DamageData(DamageType Type, DamageSubType SubType, object? S
 	/// Initializes a new instance of the <see cref="DamageData"/> class.
 	/// </summary>
 	public DamageData()
-		: this(DamageType.Any, DamageSubType.None, null)
+		: this(DamageType.None, DamageSubType.None, null)
 	{
 	}
 }
