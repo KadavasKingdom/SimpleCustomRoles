@@ -5,9 +5,6 @@ namespace SimpleCustomRoles.Extensions;
 
 #pragma warning disable CA1305 // Specify IFormatProvider
 
-/// <summary>
-/// Provides extension for Custom Roles Interfaces.
-/// </summary>
 public static partial class InterfaceExtensions
 {
 	/// <summary>

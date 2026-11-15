@@ -174,10 +174,10 @@ public class SimpleRole : CustomRoleBase,
 	public List<CandyKindID> CannotDropCandies { get; set; } = [];
 
 	/// <inheritdoc/>
-	public List<ItemType> CannotUserItems { get; set; } = [];
+	public List<ItemType> CannotUseItems { get; set; } = [];
 
 	/// <inheritdoc/>
-	public List<CandyKindID> CannotUserCandies { get; set; } = [];
+	public List<CandyKindID> CannotUseCandies { get; set; } = [];
 
 	/// <inheritdoc/>
 	public bool PocketCanEnter { get; set; } = true;

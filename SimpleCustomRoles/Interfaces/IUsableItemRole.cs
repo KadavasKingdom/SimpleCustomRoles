@@ -10,10 +10,10 @@ public interface IUsableItemRole
 	/// <summary>
 	/// Gets the list of items that the role cannot use.
 	/// </summary>
-	public List<ItemType> CannotUserItems { get; }
+	public List<ItemType> CannotUseItems { get; }
 
 	/// <summary>
 	/// Gets the list of candies that the role cannot use.
 	/// </summary>
-	public List<CandyKindID> CannotUserCandies { get; }
+	public List<CandyKindID> CannotUseCandies { get; }
 }

@@ -5,9 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleCustomRoles.Extensions;
 
-/// <summary>
-/// Provides extension for Custom Roles Interfaces.
-/// </summary>
 public static partial class InterfaceExtensions
 {
 	/// <summary>

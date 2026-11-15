@@ -42,7 +42,7 @@ internal sealed class PocketHandler : CustomEventsHandler
 
 		if (pocketDimensionRole.PocketForceFail && pocketDimensionRole.PocketForceSuccess)
 		{
-			CL.Warn($"[SCR] Role ({customRoleBase.RoleName}) Pocket force settings is invalid!");
+			CL.Warn($"Role ({customRoleBase.RoleName}) Pocket force settings is invalid!");
 			return;
 		}
 

@@ -26,14 +26,14 @@ internal sealed class UseHandler : CustomEventsHandler
 		if (ev.UsableItem is Scp330Item item && item.Base.IsCandySelected)
 		{
 			CandyKindID candyKind = item.Candies[item.SelectedCandyIndex];
-			if (usableItemRole.CannotUserCandies.Contains(candyKind))
+			if (usableItemRole.CannotUseCandies.Contains(candyKind))
 			{
 				ev.IsAllowed = false;
 				return;
 			}
 		}
 
-		if (usableItemRole.CannotUserItems.Contains(ev.UsableItem.Type))
+		if (usableItemRole.CannotUseItems.Contains(ev.UsableItem.Type))
 		{
 			ev.IsAllowed = false;
 			return;
@@ -53,7 +53,7 @@ internal sealed class UseHandler : CustomEventsHandler
 			return;
 		}
 
-		if (usableItemRole.CannotUserItems.Contains(ev.FirearmItem.Type))
+		if (usableItemRole.CannotUseItems.Contains(ev.FirearmItem.Type))
 		{
 			ev.IsAllowed = false;
 			return;

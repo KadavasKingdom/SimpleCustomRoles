@@ -65,6 +65,12 @@ internal sealed class Main : Plugin<Config>
 
 		CustomRoles.RegisterCustomRoles();
 
+		SimpleCustomRoles.Roles.SimpleRole simpleRole = new();
+		var yaml = CustomRoleYamlParser.Serializer.Serialize(simpleRole);
+		var path = Path.Combine(this.GetConfigDirectory().FullName, "Roles", "SimpleRole.yaml");
+		Directory.CreateDirectory(Path.GetDirectoryName(path));
+		File.WriteAllText(path, yaml);
+
 		// Harmony.DEBUG = Config.Debug;
 		harmony = new(Name);
 		harmony.PatchAll();

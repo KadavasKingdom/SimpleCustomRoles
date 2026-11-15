@@ -141,7 +141,8 @@ public static class CustomRoles
 			return;
 		}
 
-		if (type.Equals(null))
+		// Do NOT load this type!
+		if (type == typeof(SimpleRole))
 		{
 			return;
 		}
@@ -162,6 +163,12 @@ public static class CustomRoles
 			return;
 		}
 
+		if (string.IsNullOrEmpty(customRoleBase.ParserClassName))
+		{
+			CL.Warn($"Custom role parser is null or empty from assembly! Cannot create custom type mapping for type: {customRoleBase.GetType().FullName}");
+			return;
+		}
+
 		RolesStore.Add(customRoleBase);
 		TypeMapping.Add(customRoleBase.ParserClassName, customRoleBase.GetType());
 		customRoleBase.OnRegistered();
@@ -173,6 +180,8 @@ public static class CustomRoles
 	/// </summary>
 	public static void LoadRoles()
 	{
+		YamlStore.Clear();
+
 		string rolesPath = Path.Combine(Main.Instance.GetConfigDirectory(Main.Instance.Config.UseGlobal).FullName, "Roles");
 		if (!Directory.Exists(rolesPath))
 		{
