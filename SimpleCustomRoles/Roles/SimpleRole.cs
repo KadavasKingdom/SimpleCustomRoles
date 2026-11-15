@@ -3,6 +3,7 @@ using MapGeneration;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using SimpleCustomRoles.Datas;
 using SimpleCustomRoles.Extensions;
 using SimpleCustomRoles.Interfaces;
 using SimpleCustomRoles.Store;
@@ -36,7 +37,9 @@ public class SimpleRole : CustomRoleBase,
 	IDroppableRole,
 	IUsableItemRole,
 	IPocketDimensionRole,
-	IEscapeableRole
+	IEscapeableRole,
+	IDamageDealChangeRole,
+	IDamageReceiveChangeRole
 {
 	/// <inheritdoc/>
 	public bool CanDisplay { get; set; }
@@ -193,6 +196,12 @@ public class SimpleRole : CustomRoleBase,
 
 	/// <inheritdoc/>
 	public bool CanEscape { get; set; }
+
+	/// <inheritdoc/>
+	public List<DamageData> DamageDealt { get; set; } = [];
+
+	/// <inheritdoc/>
+	public List<DamageData> DamageReceived { get; set; } = [];
 
 	/// <inheritdoc/>
 	public override void OnSet([NotNull] Player player)
