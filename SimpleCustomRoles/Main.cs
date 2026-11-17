@@ -16,7 +16,7 @@ internal sealed class Main : Plugin<Config>
 	private static readonly List<CustomEventsHandler> Handlers =
 	[
 		new CommonHandler(), new Scp330Handler(), new DropHandler(), new UseHandler(),
-		new PocketScaleHandler(), new PocketHandler(),
+		new PocketScaleHandler(), new PocketHandler(), new HurtHandler(),
 	];
 
 	/// <summary>

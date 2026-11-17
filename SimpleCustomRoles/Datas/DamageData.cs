@@ -9,6 +9,11 @@ namespace SimpleCustomRoles.Datas;
 public record class DamageData(DamageType Type, DamageSubType SubType, object? SubValue) : MathValueFloat
 {
 	/// <summary>
+	/// Gets an empty damage data.
+	/// </summary>
+	public static DamageData Empty { get; } = new();
+
+	/// <summary>
 	/// Initializes a new instance of the <see cref="DamageData"/> class.
 	/// </summary>
 	public DamageData()

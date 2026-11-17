@@ -114,13 +114,7 @@ public class SimpleRole : CustomRoleBase,
 	public List<string> CustomNames { get; set; } = [];
 
 	/// <inheritdoc/>
-	public ushort SpawnChance { get; set; }
-
-	/// <inheritdoc/>
 	public uint SpawnCount { get; set; }
-
-	/// <inheritdoc/>
-	public bool SpawnChanceEditable { get; set; } = true;
 
 	/// <inheritdoc/>
 	public uint MinPlayerCount { get; set; }
