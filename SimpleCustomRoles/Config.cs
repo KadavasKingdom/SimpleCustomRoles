@@ -1,3 +1,5 @@
+using PlayerRoles;
+using SimpleCustomRoles.Datas;
 using System.ComponentModel;
 
 namespace SimpleCustomRoles;
@@ -22,4 +24,20 @@ public sealed class Config
 	/// </summary>
 	[Description("For CustomItemsAPI use \"/lci give {0} {1}\" for exiled use \"/ci give {0} {1}\"")]
 	public string CustomItemCommand { get; set; } = "/lci give {0} {1}";
+
+	/// <summary>
+	/// Gets or sets the normal role when escaping.
+	/// </summary>
+	public Dictionary<EscapeData, RoleTypeId> EscapeRoleChange { get; set; } = new()
+	{
+		[new(true, RoleTypeId.ChaosConscript)] = RoleTypeId.NtfSpecialist,
+		[new(true, RoleTypeId.ChaosMarauder)] = RoleTypeId.NtfSpecialist,
+		[new(true, RoleTypeId.ChaosRepressor)] = RoleTypeId.NtfSpecialist,
+		[new(true, RoleTypeId.ChaosRifleman)] = RoleTypeId.NtfSpecialist,
+		[new(true, RoleTypeId.NtfCaptain)] = RoleTypeId.ChaosMarauder,
+		[new(true, RoleTypeId.NtfPrivate)] = RoleTypeId.ChaosConscript,
+		[new(true, RoleTypeId.NtfSergeant)] = RoleTypeId.ChaosConscript,
+		[new(true, RoleTypeId.NtfSpecialist)] = RoleTypeId.ChaosConscript,
+		[new(true, RoleTypeId.FacilityGuard)] = RoleTypeId.ChaosConscript,
+	};
 }
